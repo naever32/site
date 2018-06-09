@@ -86,7 +86,7 @@ def api_params(schema: Schema, validation_type: ValidationTypes = ValidationType
 
                     data = request.get_json()
 
-                    if not isinstance(data, list):
+                    if not isinstance(data, list) and isinstance(schema._schema, list):
                         data = [data]
 
                 except JSONDecodeError:
