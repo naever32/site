@@ -92,7 +92,7 @@ def api_params(schema: Schema, validation_type: ValidationTypes = ValidationType
                 except JSONDecodeError:
                     return self.error(ErrorCodes.bad_data_format)  # pragma: no cover
 
-            elif validation_type == ValidationTypes.params:
+            elif validation_type == ValidationTypes.params and isinstance(schema._schema, list):
                 # I really don't like this section here, but I can't think of a better way to do it
                 multi = request.args  # This is a MultiDict, which should be flattened to a list of dicts
 
@@ -119,6 +119,9 @@ def api_params(schema: Schema, validation_type: ValidationTypes = ValidationType
                             obj[key] = items[i]  # Store the item at that specific index
 
                         data.append(obj)
+
+            elif validation_type == ValidationTypes.params and isinstance(schema._schema, dict):
+                data = request.args.to_dict()
 
             else:
                 raise ValueError(f"Unknown validation type: {validation_type}")  # pragma: no cover
