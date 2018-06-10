@@ -1,6 +1,6 @@
 import logging
-import sys
 import os
+import sys
 from logging import Logger, StreamHandler, handlers
 
 from logmatic import JsonFormatter
