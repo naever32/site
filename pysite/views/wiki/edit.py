@@ -8,7 +8,7 @@ from flask import redirect, request, url_for
 from werkzeug.exceptions import BadRequest
 
 from pysite.base_route import RouteView
-from pysite.constants import DEBUG_MODE, EDITOR_ROLES, GITHUB_TOKEN, WIKI_AUDIT_WEBHOOK
+from pysite.constants import DEBUG_MODE, EDITOR_ROLES, GITLAB_TOKEN, WIKI_AUDIT_WEBHOOK
 from pysite.decorators import csrf, require_roles
 from pysite.mixins import DBMixin
 from pysite.rst import render
