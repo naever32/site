@@ -144,24 +144,22 @@ class EditView(RouteView, DBMixin):
             diff = difflib.unified_diff(before, after, fromfile="before.rst", tofile="after.rst")
             diff = "".join(diff)
 
-            gist_payload = {
-                "description": f"Changes to: {obj['title']}",
-                "public": False,
-                "files": {
-                    "changes.md": {
-                        "content": f"```diff\n{diff}\n```"
-                    }
-                }
+            snippet_payload = {
+                "id": "6655143",  # ID of our site project
+                "title": f"Changes to: {obj['title']}",
+                "visibility": "internal",
+                "file_name": "changes.diff",
+                "code": diff
             }
 
             headers = {
-                "Authorization": f"token {GITHUB_TOKEN}",
+                "Private-Token": GITLAB_TOKEN,
                 "User-Agent": "Discord Python Wiki (https://gitlab.com/python-discord)"
             }
 
-            gist = requests.post("https://api.github.com/gists",
-                                 json=gist_payload,
-                                 headers=headers)
+            snippet = requests.post("https://gitlab.com/api/v4/projects/6655143/snippets",
+                                    json=snippet_payload,
+                                    headers=headers)
 
             audit_payload = {
                 "username": "Wiki Updates",
@@ -169,7 +167,7 @@ class EditView(RouteView, DBMixin):
                     {
                         "title": "Page Edit",
                         "description": f"**{obj['title']}** was edited by **{self.user_data.get('username')}**"
-                                       f".\n\n[View diff]({gist.json().get('html_url')})",
+                                       f".\n\n[View diff]({snippet.json().get('web_url')})",
                         "color": 4165079,
                         "timestamp": datetime.datetime.utcnow().isoformat(),
                         "thumbnail": {
