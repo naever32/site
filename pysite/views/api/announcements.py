@@ -1,4 +1,4 @@
-from flask import abort, jsonify
+from flask import jsonify
 from schema import And, Optional, Schema
 
 from pysite.base_route import APIView
@@ -14,6 +14,10 @@ POST_SCHEMA = Schema({
     'content': And(str, len, error="Announcement content must be a non-empty string"),
     'title': And(str, len, error="Announcement title must be a non-empty string"),
     Optional('public'): bool
+})
+
+DELETE_SCHEMA = Schema({
+    'id': str
 })
 
 
@@ -91,3 +95,26 @@ class AnnouncementManagementAPI(APIView, DBMixin, RMQMixin):
             'created_id': result['generated_keys'][0],
             'status': 'ok'
         })
+
+    @api_key
+    @api_params(schema=DELETE_SCHEMA, validation_type=ValidationTypes.params)
+    def delete(self, params: dict):
+        """
+        Delete an announcement from the database.
+        The announcement to delete must be specified with
+        the query argument `id`.
+        Returns a dictionary containing a single key,
+        `deleted`, which is an integer denoting the
+        amount of objects deleted by this method,
+        either 0 or 1.
+
+        The `id` must be supplied as a parameter.
+        API key must be provided as header.
+        """
+
+        result = self.db.delete(
+            self.table_name,
+            params['id'],
+            return_changes=True
+        )
+        return jsonify(deleted=result['deleted'])
