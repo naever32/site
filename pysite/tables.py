@@ -8,6 +8,16 @@ class Table(NamedTuple):
 
 
 TABLES = {
+    "announcements": Table(
+        primary_key="id",
+        keys=sorted([
+            "id",
+            "title",
+            "content",
+            "public"
+        ])
+    ),
+
     "bot_events": Table(  # Events to be sent to the bot via websocket
         primary_key="id",
         keys=sorted([
