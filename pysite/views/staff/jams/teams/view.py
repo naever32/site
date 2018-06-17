@@ -6,7 +6,7 @@ from pysite.constants import ALL_STAFF_ROLES
 from pysite.decorators import require_roles
 from pysite.mixins import DBMixin
 
-REQUIRED_KEYS = ["title", "date_start", "date_end"]
+REQUIRED_KEYS = ("title", "date_start", "date_end")
 
 
 class StaffView(RouteView, DBMixin):

@@ -7,16 +7,16 @@ from pysite.decorators import csrf, require_roles
 from pysite.mixins import DBMixin, RMQMixin
 from pysite.utils.words import get_word_pairs
 
-GET_ACTIONS = ["questions"]
-POST_ACTIONS = [
+GET_ACTIONS = ("questions",)
+POST_ACTIONS = (
     "associate_question", "disassociate_question", "infraction", "questions", "state", "approve_application",
     "unapprove_application", "create_team", "generate_teams", "set_team_member",
     "reroll_team"
-]
-DELETE_ACTIONS = ["infraction", "question", "team"]
+)
+DELETE_ACTIONS = ("infraction", "question", "team")
 
-KEYS = ["action"]
-QUESTION_KEYS = ["optional", "title", "type"]
+KEYS = ("action",)
+QUESTION_KEYS = ("optional", "title", "type")
 
 
 class ActionView(APIView, DBMixin, RMQMixin):

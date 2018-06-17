@@ -125,9 +125,9 @@ class UserView(APIView, DBMixin):
         self.db.sync(self.infractions_table)
         self.db.sync(self.oauth_table_name)
         self.db.sync(self.participants_table)
-        self.db.sync(self.teams_table)
         self.db.sync(self.responses_table)
         self.db.sync(self.table_name)
+        self.db.sync(self.teams_table)
 
         changes["deleted"] = deletions
         changes["deleted_oauth"] = oauth_deletions

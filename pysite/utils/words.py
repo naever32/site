@@ -1,7 +1,7 @@
 import random
 from typing import Iterator, List, Tuple
 
-adjectives = [
+adjectives = (
     "abortive", "abounding", "abrasive", "absent", "acceptable", "adamant", "adhesive", "adjoining", "aggressive",
     "alike", "alleged", "aloof", "ambitious", "amused", "aspiring", "available", "awake", "axiomatic", "barbarous",
     "bashful", "beautiful", "befitting", "beneficial", "blushing", "boundless", "brawny", "certain", "childlike",
@@ -22,9 +22,9 @@ adjectives = [
     "temporary", "tender", "tense", "tenuous", "thinkable", "thoughtless", "tiny", "tough", "trashy", "two",
     "uncovered", "uninterested", "unruly", "unsuitable", "used", "useful", "vagabond", "verdant", "vivacious",
     "voiceless", "waggish", "wasteful", "wealthy", "whole", "wise", "woebegone", "workable", "wrong", "young",
-]
+)
 
-nouns = [
+nouns = (
     "actions", "activities", "additions", "advertisements", "afterthoughts", "airplanes", "amounts", "angles", "ants",
     "baskets", "baths", "battles", "bees", "beginners", "behaviors", "beliefs", "bells", "berries", "bikes",
     "birthdays", "bits", "boats", "boys", "breaths", "bubbles", "bulbs", "bursts", "butter", "cables", "camps", "cans",
@@ -43,7 +43,7 @@ nouns = [
     "tomatoes", "trains", "treatments", "troubles", "tubs", "turkeys", "umbrellas", "uncles", "vacations", "veils",
     "voices", "volcanoes", "volleyballs", "walls", "wars", "waters", "waves", "wilderness", "women", "words", "works",
     "worms", "wounds", "writings", "yams", "yards", "yarns", "zebras"
-]
+)
 
 
 def get_adjectives(num: int = 1) -> List[str]:
