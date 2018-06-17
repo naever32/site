@@ -101,15 +101,6 @@ JAM_QUESTION_TYPES = [
 # CSRF
 CSRF = CSRFProtect()
 
-# GitLab Token
-GITLAB_TOKEN = environ.get("GITLAB_TOKEN")
-
-# GitLab Project ID
-SITE_PROJECT_ID = "6655143"
-
-# Audit Webhook
-WIKI_AUDIT_WEBHOOK = environ.get("WIKI_AUDIT_WEBHOOK")
-
 # Bot key
 BOT_API_KEY = environ.get("BOT_API_KEY")
 
