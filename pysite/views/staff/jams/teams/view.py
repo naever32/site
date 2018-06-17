@@ -77,14 +77,10 @@ class StaffView(RouteView, DBMixin):
         except ReqlNonExistenceError:
             raise NotFound()
 
-        print(jam_data)
-
         questions = {}
 
         for question in jam_data["form"]["questions"]:
             questions[question] = self.db.get(self.questions_table, question)
-
-        print(questions)
 
         teams = {}
         participants = {}
