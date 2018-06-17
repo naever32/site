@@ -102,16 +102,16 @@ JAM_QUESTION_TYPES = [
 CSRF = CSRFProtect()
 
 # GitLab Token
-GITLAB_TOKEN = environ.get("GITLAB_TOKEN") or None
+GITLAB_TOKEN = environ.get("GITLAB_TOKEN")
 
 # GitLab Project ID
 SITE_PROJECT_ID = "6655143"
 
 # Audit Webhook
-WIKI_AUDIT_WEBHOOK = environ.get("WIKI_AUDIT_WEBHOOK") or None
+WIKI_AUDIT_WEBHOOK = environ.get("WIKI_AUDIT_WEBHOOK")
 
 # Bot key
-BOT_API_KEY = environ.get("BOT_API_KEY") or None
+BOT_API_KEY = environ.get("BOT_API_KEY")
 
 # RabbitMQ settings
 BOT_EVENT_QUEUE = "bot_events"
