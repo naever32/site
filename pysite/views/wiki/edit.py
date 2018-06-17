@@ -136,8 +136,9 @@ class EditView(RouteView, DBMixin, RMQMixin):
             BotEventTypes.send_embed,
             {
                 "target": CHANNEL_MOD_LOG,
-                "title": f"Wiki Edit: {old['post']['title']}",
-                "description": f"Page edited by <@{self.user_data.get('user_id')}>. [View the diff here]({link})",
+                "title": "Page Edit",
+                "description": f"**{old['post']['title']}** edited by **{self.user_data.get('username')}**. "
+                               f"[View the diff here]({link})",
                 "color": 0x3F8DD7,  # Light blue
                 "timestamp": datetime.datetime.now().isoformat()
             }
