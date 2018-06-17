@@ -101,8 +101,11 @@ JAM_QUESTION_TYPES = [
 # CSRF
 CSRF = CSRFProtect()
 
-# GitHub Token
+# GitLab Token
 GITLAB_TOKEN = environ.get("GITLAB_TOKEN") or None
+
+# GitLab Project ID
+SITE_PROJECT_ID = "6655143"
 
 # Audit Webhook
 WIKI_AUDIT_WEBHOOK = environ.get("WIKI_AUDIT_WEBHOOK") or None

@@ -8,7 +8,7 @@ from flask import redirect, request, url_for
 from werkzeug.exceptions import BadRequest
 
 from pysite.base_route import RouteView
-from pysite.constants import DEBUG_MODE, EDITOR_ROLES, GITLAB_TOKEN, WIKI_AUDIT_WEBHOOK
+from pysite.constants import DEBUG_MODE, EDITOR_ROLES, GITLAB_TOKEN, SITE_PROJECT_ID, WIKI_AUDIT_WEBHOOK
 from pysite.decorators import csrf, require_roles
 from pysite.mixins import DBMixin
 from pysite.rst import render
@@ -145,7 +145,7 @@ class EditView(RouteView, DBMixin):
             diff = "".join(diff)
 
             snippet_payload = {
-                "id": "6655143",  # ID of our site project
+                "id": SITE_PROJECT_ID,  # ID of our site project
                 "title": f"Changes to: {obj['title']}",
                 "visibility": "internal",
                 "file_name": "changes.diff",
