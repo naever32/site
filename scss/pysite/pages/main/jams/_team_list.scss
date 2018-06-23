@@ -24,12 +24,12 @@ $page_classes: (jam-team-list);
       padding: 10px;
       text-align: center;
 
+      .team-member-avatar {
+        height: 32px;
+      }
+
       .team-member-avatar-link {
         margin: 0 5px;
-
-        .team-member-avatar {
-          height: 32px;
-        }
       }
 
       .team-member-avatar-link:hover,

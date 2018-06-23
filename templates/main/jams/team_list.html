@@ -44,7 +44,7 @@
                                            title="{{ member.username }}#{{ member.discriminator }}"
                                            target="_blank"
                                            class="team-member-avatar-link">
-                                            <img src="{{ member.avatar }}" class="team-member-avatar uk-border-circle"/>
+                                            <img src="{{ member.avatar.replace(".webp", ".png") }}" class="team-member-avatar uk-border-circle"/>
                                         </a>
                                     {% endfor %}
                                 </div>

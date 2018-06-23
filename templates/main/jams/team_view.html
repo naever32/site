@@ -34,8 +34,7 @@
                     <div class="participant-card-list">
                         {% for member in team.members %}
                             <div class="participant-card uk-card-default">
-                                <img src="{{ member.avatar }}" class="uk-border-circle participant-avatar"
-                                     height="20px">
+                                <img src="{{ member.avatar.replace(".webp", ".png") }}" class="uk-border-circle participant-avatar">
                                 <strong>{{ member.username }}#{{ member.discriminator }}</strong>
                                 <div class="participant-links">
                                     <a href="https://discordapp.com/users/{{ member.user_id }}" target="_blank"
