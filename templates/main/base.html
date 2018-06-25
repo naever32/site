@@ -49,5 +49,9 @@
                 </div>
             </div>
         </footer>
+        <script>
+        // Loading the countdown for Code Jams
+        countdown("{{ url_for("api.jams.countdown") }}", "{{ csrf_token() }}");
+        </script>
     </body>
 </html>
