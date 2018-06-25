@@ -3,24 +3,24 @@
 function countdown(countdown_url, csrf_token){
     $.ajax(
         countdown_url, {
-        "headers": {"X-CSRFToken": csrf_token}
-    }).done(data => {
-        let start = data.date_start; // Used for shorthand to increase readability
-        let end = data.date_end;
+            "headers": {"X-CSRFToken": csrf_token}
+        }
+    ).done(data => {
+        const start = data.date_start; // Used for shorthand to increase readability
+        const end = data.date_end;
 
         const startjam = new Date(Date.UTC( // As the months, days, etc. all start from 0 we need to negate 1
-            start.year, start.month-1, start.day-1,
-            start.hours-1, start.minutes-1, start.seconds-1
+            start.year, start.month - 1, start.day - 1,
+            start.hours - 1, start.minutes - 1, start.seconds - 1
         ));
         const endjam = new Date(Date.UTC(
-            end.year, end.month-1, end.day-1,
-            end.hours-1, end.minutes-1, end.seconds-1
+            end.year, end.month - 1, end.day - 1,
+            end.hours - 1, end.minutes - 1, end.seconds - 1
         ));
 
         const now = Date.now();
         let goal;
         if (now + 1000 < endjam.getTime()) { // Only do anything if the jam hasn't ended
-            console.log("good");
             UIkit.notification( // Spawn the notification
                 {
                     "message": ""
@@ -89,4 +89,4 @@ function countdown(countdown_url, csrf_token){
             }, 500);
         }
     });
-};
+}
