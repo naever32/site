@@ -20,16 +20,19 @@ class JamsTeamListView(RouteView, DBMixin, OAuthMixin):
         if not jam_obj:
             raise NotFound()
 
-        query = self.db.query(self.table_name).get_all(self.table_name, *jam_obj["teams"]).pluck(
-            ["id", "name", "members", "repo"]).merge(
-            lambda team: {
-                "members":
-                    self.db.query("users")
-                        .filter(lambda user: team["members"].contains(user["user_id"]))
-                        .coerce_to("array")
-            }).coerce_to("array")
+        # Get all the participants of this jam
+        participants = self.db.get_all("users", *jam_obj["participants"], index="user_id")
+        # Transform the array of documents to a dict with the user_ids as keys
+        participant_dict = {user["user_id"]: user for user in participants}
 
+        # Get all the teams, leaving the team members as only an array of IDs
+        query = self.db.query(self.table_name).get_all(self.table_name, *jam_obj["teams"]).pluck(
+            ["id", "name", "members", "repo"]).coerce_to("array")
         jam_obj["teams"] = self.db.run(query)
+
+        # Populate each team's members using the previously queries participant list
+        for team in jam_obj["teams"]:
+            team["members"] = [participant_dict[user_id] for user_id in team["members"]]
 
         return self.render(
             "main/jams/team_list.html",
