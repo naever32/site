@@ -57,3 +57,34 @@ class AddingChannelNameToDatabaseEndpointTests(SiteTest):
         )
         self.assert200(response)
         self.assertIn(self.CHANNEL_NAME, response.json)
+
+
+class RandomSampleEndpointTests(SiteTest):
+    """Tests fetching random names from the website with GET."""
+
+    CHANNEL_NAME_1 = 'chicken-shed'
+    CHANNEL_NAME_2 = 'robot-kindergarten'
+
+    def setUp(self):
+        response = self.client.post(
+            f'/bot/off-topic-names?name={self.CHANNEL_NAME_1}',
+            app.config['API_SUBDOMAIN'],
+            headers=app.config['TEST_HEADER']
+        )
+        self.assert200(response)
+
+        response = self.client.post(
+            f'/bot/off-topic-names?name={self.CHANNEL_NAME_2}',
+            app.config['API_SUBDOMAIN'],
+            headers=app.config['TEST_HEADER']
+        )
+        self.assert200(response)
+
+    def test_returns_limited_names_with_random_query_param(self):
+        response = self.client.get(
+            '/bot/off-topic-names?random_items=1',
+            app.config['API_SUBDOMAIN'],
+            headers=app.config['TEST_HEADER']
+        )
+        self.assert200(response)
+        self.assertEqual(len(response.json), 1)

@@ -1,4 +1,6 @@
-from flask import jsonify
+import random
+
+from flask import jsonify, request
 from schema import And, Schema
 
 from pysite.base_route import APIView
@@ -33,12 +35,26 @@ class OffTopicNamesView(APIView, DBMixin):
         Fetch all known off-topic channel names from the database.
         Returns a list of strings, the strings being the off-topic names.
 
+        If the query argument `random_items` is provided (a non-negative integer),
+        then this view will return `random_items` random names from the database
+        instead of returning all items at once.
+
         API key must be provided as header.
         """
 
         names = [
             entry['name'] for entry in self.db.get_all(self.table_name)
         ]
+
+        if 'random_items' in request.args:
+            random_count = request.args['random_items']
+            if not random_count.isdigit():
+                response = {'message': "`random_items` must be a valid integer"}
+                return jsonify(response), 400
+
+            samples = random.sample(names, int(random_count))
+            return jsonify(samples)
+
         return jsonify(names)
 
     @api_key
