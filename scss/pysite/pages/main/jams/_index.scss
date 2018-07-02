@@ -1,5 +1,8 @@
+@import "variables";
+@import "../../../../uikit/variables";
+
 $page_classes: (
-  page-main-jams-index,
+        page-main-jams-index,
 );
 
 @each $class in $page_classes {
@@ -10,6 +13,36 @@ $page_classes: (
 
     .theme-label {
       margin-top: 3px;
+    }
+
+    .jam-tiles {
+      border-color: $border_darker transparent;
+      border-style: solid;
+      border-width: 1px;
+
+      .uk-tile-success {
+        background: $success_colour;
+
+        .uk-h4 {
+          color: $white;
+        }
+      }
+
+      .uk-tile-danger {
+        background: $danger_colour;
+
+        .uk-h4 {
+          color: $white;
+        }
+      }
+
+      .uk-tile-winner {
+        background: $winner_colour_brighter;
+
+        .uk-h4 {
+          color: $white;
+        }
+      }
     }
   }
 }
