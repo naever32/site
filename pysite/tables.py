@@ -140,7 +140,8 @@ TABLES = {
 
     "off_topic_names": Table(  # Names for the off-topic category channels
         primary_key="name",
-        keys=("name",)
+        keys=("name",),
+        locked=False
     ),
 
     "snake_facts": Table(  # Snake facts
