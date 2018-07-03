@@ -2,7 +2,7 @@ import json
 from json import JSONDecodeError
 from typing import Dict
 
-from flask import url_for, request
+from flask import request, url_for
 
 from pysite.base_route import RouteView
 from pysite.mixins import DBMixin
@@ -14,8 +14,8 @@ class ChallengesIndexView(RouteView, DBMixin):
     table_name = "challenges"
 
     def get(self):
-        filter_raw = request.args.get("filter", default="{}")
-        page_number = request.args.get("page", default=1, type=int)
+        filter_raw = request.args.get("filter", default=str({}))
+        # todo: page_number = request.args.get("page", default=1, type=int)
 
         try:
             active_filter = json.loads(filter_raw)
