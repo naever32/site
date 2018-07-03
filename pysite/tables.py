@@ -250,4 +250,20 @@ TABLES = {
         ]),
         locked=False
     ),
+
+    "challenges": Table(  # Challenges
+        primary_key="id",
+        keys=sorted([
+            "id",  # uuid
+            "author_id",  # str
+            "date",  # datetime
+            "title",  # str
+            "summary",  # str
+            "difficulty",  # str
+            "preamble_html",  # str
+            "task_html",  # str
+            "hint_html",  # str
+            "bonus_html"  # str
+        ])
+    ),
 }

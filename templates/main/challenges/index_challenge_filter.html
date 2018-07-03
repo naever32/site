@@ -1,0 +1,5 @@
+{% if mod and filter_match(filter, mod) %}
+    <li class="uk-active"><a href="{{ filter_url(filter, mod) }}"><i class="uk-icon fa-fw far fa-check"></i> {{ name }}</a></li>
+{% else %}
+    <li><a href="{{ filter_url(filter, mod) }}">{{ name }}</a></li>
+{% endif %}

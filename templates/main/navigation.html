@@ -149,6 +149,18 @@
                                 <li><a href="{{ url_for('main.jams.user_team_list') }}">My Teams</a></li>
                             {% endif %}
 
+                            {% if current_page.startswith("main.challenges") %}
+                                <li class="uk-nav-header uk-active"><a href="{{ url_for('main.challenges.index') }}">Challenges</a></li>
+                            {% else %}
+                                <li class="uk-nav-header"><a href="{{ url_for('main.challenges.index') }}">Challenges</a></li>
+                            {% endif %}
+
+                            {% if current_page == "main.challenges.index" %}
+                                <li class="uk-active"><a href="{{ url_for('main.challenges.index') }}">All Challenges</a></li>
+                            {% else %}
+                                <li><a href="{{ url_for('main.challenges.index') }}">All Challenges</a></li>
+                            {% endif %}
+
                             <li class="uk-nav-divider"></li>
 
                             {% if current_page.startswith("main.about.privacy") %}

@@ -1,0 +1,97 @@
+{% extends "main/base.html" %}
+{% block title %}Challenges | Home{% endblock %}
+{% block og_title %}Challenges | Home{% endblock %}
+{% block page_classes %}page-main-challenges-index{% endblock %}
+
+{% block content %}
+    <div class="uk-section">
+        <div class="uk-container">
+            <h1 class="uk-header uk-article-title">
+                Challenges
+                <p class="uk-article-meta">
+                    Compete in our Python challenges!
+                </p>
+            </h1>
+            <div class="uk-margin-small-top">
+                {% if logged_in %}
+                    <a class="uk-button uk-button-primary" type="button" href="#">
+                        <i class="uk-icon fa-fw far fa-plus"></i>&nbsp;
+                        Create
+                    </a>
+                {% endif %}
+                <button class="uk-button uk-button-default" type="button">
+                    <i class="uk-icon fa-fw far fa-filter"></i>&nbsp;
+                    Filter
+                </button>
+                <div uk-dropdown="mode: click">
+                    <ul class="uk-nav uk-dropdown-nav">
+                        {% with filter={}, mod={}, name="Reset Filter" %}
+                            {% include "main/challenges/index_challenge_filter.html" %}
+                        {% endwith %}
+
+                        <li class="uk-nav-header">Difficulty</li>
+                        {% with mod={"difficulty": "beginner"}, name="Beginner" %}
+                            {% include "main/challenges/index_challenge_filter.html" %}
+                        {% endwith %}
+                        {% with mod={"difficulty": "intermediate"}, name="Intermediate" %}
+                            {% include "main/challenges/index_challenge_filter.html" %}
+                        {% endwith %}
+                        {% with mod={"difficulty": "expert"}, name="Expert" %}
+                            {% include "main/challenges/index_challenge_filter.html" %}
+                        {% endwith %}
+                        {% with mod={"difficulty": None}, name="Any" %}
+                            {% include "main/challenges/index_challenge_filter.html" %}
+                        {% endwith %}
+
+                        {% if logged_in %}
+                            <li class="uk-nav-header">Completion</li>
+                            {% with mod={"completed": True}, name="Completed" %}
+                                {% include "main/challenges/index_challenge_filter.html" %}
+                            {% endwith %}
+                            {% with mod={"completed": False}, name="Not Completed" %}
+                                {% include "main/challenges/index_challenge_filter.html" %}
+                            {% endwith %}
+                            {% with mod={"completed": None}, name="All" %}
+                                {% include "main/challenges/index_challenge_filter.html" %}
+                            {% endwith %}
+                        {% endif %}
+                    </ul>
+                </div>
+                <a class="uk-button uk-button-default" type="button" href="#">
+                    <i class="uk-icon fa-fw fal fa-random"></i>&nbsp;
+                    Random
+                </a>
+            </div>
+            <div class="uk-child-width-1-1@s uk-child-width-1-2@m uk-margin-medium-top" uk-grid>
+                <div>
+                    <div class="uk-card uk-card-default uk-margin-small-top">
+                        <div class="uk-card-body">
+                            <div class="uk-card-title">
+                                404 Code not found
+                                <span class="uk-float-right">
+                                </span>
+                            </div>
+                            <div>
+                            <span class="uk-label uk-label-warning">
+                                Intermediate
+                            </span>
+                                <span class="uk-label uk-label-primary">
+                                Not Completed
+                            </span>
+                            </div>
+                            <p>
+                                Summary: Write a program with X characters that raises an error of the same size.
+                            </p>
+                            <p class="challenge-author-name">
+                                Submitted by Martmists#3740
+                            </p>
+                            <a class="uk-button uk-button-primary uk-align-center" href="#">
+                                <i class="uk-icon fa-fw far fa-eye"></i> &nbsp;View
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
