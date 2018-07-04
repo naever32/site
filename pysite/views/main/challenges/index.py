@@ -37,18 +37,20 @@ class ChallengesIndexView(RouteView, DBMixin):
         if "difficulty" in active_filter:
             query_filter["difficulty"] = active_filter["difficulty"].lower()
 
+        # it is known: the uglier the query, the more faster it be going
         challenge_filter_query = self.db.query(self.table_name).filter(
             query_filter
-        )
-        challenge_filter_total_count_query = challenge_filter_query.count()
-        challenge_filter_sliced_query = challenge_filter_query.merge(
-            lambda challenge: {
-                "author": self.db.query("users").get(challenge["author_id"])
-            }
-        ).order_by(rethinkdb.desc("date")).slice(*page_slice).coerce_to("array")
-
-        total_page_count = math.ceil(self.db.run(challenge_filter_total_count_query) / CHALLENGES_PER_PAGE)
-        challenges = self.db.run(challenge_filter_sliced_query)
+        ).coerce_to("array").do(lambda filter_result: {
+            "total_item_count": filter_result.count(),
+            "page_content": filter_result.order_by(rethinkdb.desc("date")).slice(*page_slice).merge(
+                lambda challenge: {
+                    "author": self.db.query("users").get(challenge["author_id"])
+                }
+            )
+        })
+        challenge_filter_result = self.db.run(challenge_filter_query)
+        total_page_count = math.ceil(challenge_filter_result["total_item_count"] / CHALLENGES_PER_PAGE)
+        challenges = challenge_filter_result["page_content"]
 
         return self.render(
             "main/challenges/index.html", filter=active_filter, filter_url=self.filter_url,

@@ -1,7 +1,6 @@
 {% extends "main/base.html" %}
 {% block title %}Challenges | Home{% endblock %}
 {% block og_title %}Challenges | Home{% endblock %}
-{% block page_classes %}page-main-challenges-index{% endblock %}
 
 {% block content %}
     <div class="uk-section">
@@ -84,7 +83,7 @@
                                             <span class="uk-label uk-label-warning">
                                             Intermediate
                                         </span>
-                                        {% elif challenge.difficulty == "hard" %}
+                                        {% elif challenge.difficulty == "expert" %}
                                             <span class="uk-label uk-label-danger">
                                             Expert
                                         </span>
