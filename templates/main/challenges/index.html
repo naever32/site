@@ -62,36 +62,71 @@
                     Random
                 </a>
             </div>
-            <div class="uk-child-width-1-1@s uk-child-width-1-2@m uk-margin-medium-top" uk-grid>
-                <div>
-                    <div class="uk-card uk-card-default uk-margin-small-top">
-                        <div class="uk-card-body">
-                            <div class="uk-card-title">
-                                404 Code not found
-                                <span class="uk-float-right">
-                                </span>
+            {% if not challenges %}
+                <p>
+                    Sorry, there are no challenges matching this filter.
+                </p>
+            {% else %}
+                <div class="uk-child-width-1-1@s uk-child-width-1-2@m uk-margin-medium-top" uk-grid>
+                    {% for challenge in challenges %}
+                        <div>
+                            <div class="uk-card uk-card-default uk-margin-small-top">
+                                <div class="uk-card-body">
+                                    <div class="uk-card-title">
+                                        {{ challenge.title }}
+                                    </div>
+                                    <div>
+                                        {% if challenge.difficulty == "beginner" %}
+                                            <span class="uk-label uk-label-success">
+                                            Beginner
+                                        </span>
+                                        {% elif challenge.difficulty == "intermediate" %}
+                                            <span class="uk-label uk-label-warning">
+                                            Intermediate
+                                        </span>
+                                        {% elif challenge.difficulty == "hard" %}
+                                            <span class="uk-label uk-label-danger">
+                                            Expert
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                    <p>
+                                        Summary: {{ challenge.summary }}
+                                    </p>
+                                    <p class="challenge-author-name">
+                                        Submitted
+                                        by {{ challenge.author.username }}#{{ challenge.author.discriminator }}
+                                    </p>
+                                    <a class="uk-button uk-button-primary uk-align-center" href="#">
+                                        <i class="uk-icon fa-fw far fa-eye"></i> &nbsp;View
+                                    </a>
+                                </div>
                             </div>
-                            <div>
-                            <span class="uk-label uk-label-warning">
-                                Intermediate
-                            </span>
-                                <span class="uk-label uk-label-primary">
-                                Not Completed
-                            </span>
-                            </div>
-                            <p>
-                                Summary: Write a program with X characters that raises an error of the same size.
-                            </p>
-                            <p class="challenge-author-name">
-                                Submitted by Martmists#3740
-                            </p>
-                            <a class="uk-button uk-button-primary uk-align-center" href="#">
-                                <i class="uk-icon fa-fw far fa-eye"></i> &nbsp;View
-                            </a>
                         </div>
-                    </div>
+                    {% endfor %}
                 </div>
-            </div>
+                <ul class="uk-pagination uk-margin-medium uk-flex uk-flex-center">
+                    {% for page in pagination(page_number, total_page_count, filter) %}
+                        {% if page.disabled %}
+                            <li class="uk-disabled">
+                        {% elif page.active %}
+                            <li class="uk-active">
+                        {% else %}
+                            <li>
+                        {% endif %}
+
+                        {% if page.num == "previous" %}
+                            <a href="{{ page.url }}"><span uk-pagination-previous></span></a>
+                        {% elif page.num == "next" %}
+                            <a href="{{ page.url }}"><span uk-pagination-next></span></a>
+                        {% else %}
+                            <a href="{{ page.url }}">{{ page.num }}</a>
+                        {% endif %}
+
+                            </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
         </div>
     </div>
 {% endblock %}
