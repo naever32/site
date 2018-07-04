@@ -22,26 +22,22 @@ $page_classes: (
 
       .uk-tile-success {
         background: $success_colour;
-
-        .uk-h4 {
-          color: $white;
-        }
       }
 
       .uk-tile-danger {
         background: $danger_colour;
-
-        .uk-h4 {
-          color: $white;
-        }
       }
 
       .uk-tile-winner {
         background: $winner_colour_brighter;
+      }
 
-        .uk-h4 {
-          color: $white;
-        }
+      .jam-tile-text {
+        align-items: center;
+        color: $white;
+        display: flex;
+        justify-content: center;
+        text-transform: uppercase;
       }
     }
   }
