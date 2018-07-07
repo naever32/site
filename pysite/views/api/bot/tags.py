@@ -12,7 +12,8 @@ GET_SCHEMA = Schema({
 
 POST_SCHEMA = Schema({
     "tag_name": str,
-    "tag_content": str
+    "tag_content": str,
+    Optional("image_url"): str
 })
 
 DELETE_SCHEMA = Schema({
@@ -77,7 +78,8 @@ class TagsView(APIView, DBMixin):
             self.table_name,
             {
                 "tag_name": tag_name,
-                "tag_content": tag_content
+                "tag_content": tag_content,
+                "image_url": json_data.get("image_url")
             },
             conflict="update"  # If it exists, update it.
         )

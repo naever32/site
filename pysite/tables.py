@@ -194,7 +194,8 @@ TABLES = {
         primary_key="tag_name",
         keys=sorted([
             "tag_name",
-            "tag_content"
+            "tag_content",
+            "image_url"
         ]),
         locked=False
     ),
