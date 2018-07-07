@@ -9,7 +9,8 @@ class ApiBotTagsEndpoint(SiteTest):
 
         post_data = json.dumps({
             'tag_name': 'testing',
-            'tag_content': 'testing'
+            'tag_content': 'testing',
+            'image_url': None
         })
 
         get_data = json.dumps({

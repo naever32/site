@@ -1,5 +1,5 @@
 from flask import jsonify
-from schema import Optional, Schema
+from schema import Optional, Or, Schema
 
 from pysite.base_route import APIView
 from pysite.constants import ValidationTypes
@@ -13,7 +13,7 @@ GET_SCHEMA = Schema({
 POST_SCHEMA = Schema({
     "tag_name": str,
     "tag_content": str,
-    Optional("image_url"): str
+    "image_url": Or(str, None, error="`image_url` must be none or a string")
 })
 
 DELETE_SCHEMA = Schema({
