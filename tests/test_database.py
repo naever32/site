@@ -1,5 +1,6 @@
 from tests import SiteTest
 
+
 class DatabaseTests(SiteTest):
     """ Test cases for the database module """
     def test_table_actions(self):
