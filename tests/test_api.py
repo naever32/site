@@ -1,5 +1,6 @@
 from tests import SiteTest, app
 
+
 class ApiEndpoints(SiteTest):
     """ Test cases for the api subdomain """
     def test_api_unknown_route(self):
@@ -22,4 +23,3 @@ class ApiEndpoints(SiteTest):
         av = APIView()
         av.error(ErrorCodes.unauthorized)
         av.error(ErrorCodes.bad_data_format)
-
