@@ -1,11 +1,8 @@
+import json
 import os
 
 from flask import Blueprint
 from flask_testing import TestCase
-
-from app import manager
-from gunicorn_config import _when_ready as when_ready
-
 
 os.environ["BOT_API_KEY"] = "abcdefg"  # This is a constant, must be done first
 os.environ["PAPERTRAIL_ADDRESS"] = 'localhost'  # satisfies coverage
@@ -14,6 +11,8 @@ os.environ["DATADOG_ADDRESS"] = 'localhost'  # satisfies coverage
 if "FLASK_DEBUG" in os.environ:
     del os.environ["FLASK_DEBUG"]  # Some unit tests fail if this is set
 
+from app import manager
+from gunicorn_config import _when_ready as when_ready
 
 when_ready()
 
