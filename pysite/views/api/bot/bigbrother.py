@@ -1,7 +1,7 @@
 import json
 
 from flask import jsonify
-from schema import Optional, Schema
+from schema import And, Optional, Schema
 
 from pysite.base_route import APIView
 from pysite.constants import ValidationTypes
@@ -11,7 +11,7 @@ from pysite.mixins import DBMixin
 
 GET_SCHEMA = Schema({
     # This is passed as a GET parameter, so it has to be a string
-    Optional('user_id'): str
+    Optional('user_id'): And(str, str.isnumeric, error="`user_id` must be numeric")
 })
 
 POST_SCHEMA = Schema({
@@ -20,15 +20,15 @@ POST_SCHEMA = Schema({
 })
 
 DELETE_SCHEMA = Schema({
-    'user_id': int
+    'user_id': And(str, str.isnumeric, error="`user_id` must be numeric")
 })
 
 
 NOT_A_NUMBER_JSON = json.dumps({
-    'message': "The given `user_id` parameter is not a valid number"
+    'error_message': "The given `user_id` parameter is not a valid number"
 })
 NOT_FOUND_JSON = json.dumps({
-    'message': "No entry for the requested user ID could be found."
+    'error_message': "No entry for the requested user ID could be found."
 })
 
 
@@ -43,24 +43,21 @@ class BigBrotherView(APIView, DBMixin):
         """
         Without query parameters, returns a list of all monitored users.
         A parameter `user_id` can be specified to return a single entry,
-        or a dictionary with the string field 'message' that tells why it failed.
+        or a dictionary with the string field 'error_message' that tells why it failed.
 
         If the returned status is 200, has got either a list of entries
         or a single object (see above).
 
         If the returned status is 400, the `user_id` parameter was incorrectly specified.
         If the returned status is 404, the given `user_id` could not be found.
-        See the 'message' field in the JSON response for more information.
+        See the 'error_message' field in the JSON response for more information.
 
-        Params must be provided as query parameters.
+        The user ID must be provided as query parameter.
         API key must be provided as header.
         """
 
         user_id = params.get('user_id')
         if user_id is not None:
-            if not user_id.isnumeric():
-                return NOT_A_NUMBER_JSON, 400
-
             data = self.db.get(self.table_name, int(user_id))
             if data is None:
                 return NOT_FOUND_JSON, 404
@@ -77,8 +74,8 @@ class BigBrotherView(APIView, DBMixin):
         Adds a new entry to the database.
         Entries take the following form:
         {
-            "user_id": ...,  # The user ID of the user being monitored as an integer.
-            "channel_id": ...  # The channel ID the user's messages will be relayed to as an integer.
+            "user_id": ...,  # The user ID of the user being monitored, as an integer.
+            "channel_id": ...  # The channel ID that the user's messages will be relayed to, as an integer.
         }
 
         If an entry for the given `user_id` already exists, it will be updated with the new channel ID.
@@ -96,6 +93,26 @@ class BigBrotherView(APIView, DBMixin):
                 'channel_id': data['channel_id']
             },
             conflict='update'
+        )
+
+        return '', 204
+
+    @api_key
+    @api_params(schema=DELETE_SCHEMA, validation_type=ValidationTypes.params)
+    def delete(self, params):
+        """
+        Removes an entry for the given `user_id`.
+
+        Returns 204 (ok, empty response) on success.
+        Returns 400 if the given `user_id` is invalid.
+
+        The user ID must be provided as query parameter.
+        API key must be provided as header.
+        """
+
+        self.db.delete(
+            self.table_name,
+            params['user_id']
         )
 
         return '', 204
