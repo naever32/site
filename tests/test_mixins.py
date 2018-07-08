@@ -1,5 +1,5 @@
-import os
 from tests import SiteTest, manager
+
 
 class MixinTests(SiteTest):
     """ Test cases for mixins """
