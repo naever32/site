@@ -61,7 +61,7 @@ class BigBrotherView(APIView, DBMixin):
             if not user_id.isnumeric():
                 return NOT_A_NUMBER_JSON, 400
 
-            data = self.db.get(self.table_name, user_id)
+            data = self.db.get(self.table_name, int(user_id))
             if data is None:
                 return NOT_FOUND_JSON, 404
             return jsonify(data)
