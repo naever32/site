@@ -1,5 +1,6 @@
 from tests import SiteTest, manager
 
+
 class Utilities(SiteTest):
     """ Test cases for internal utility code """
     def test_error_view_runtime_error(self):
