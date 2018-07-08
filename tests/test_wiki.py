@@ -1,5 +1,5 @@
-import os
 from tests import SiteTest, app
+
 
 class WikiEndpoints(SiteTest):
     """ Test cases for the wiki subdomain """
@@ -15,13 +15,18 @@ class WikiEndpoints(SiteTest):
 
     def test_wiki_history(self):
         """Test the history show"""
-        response = self.client.get("/history/show/blahblah-non-existant-page", app.config['WIKI_SUBDOMAIN'])
-        self.assertEqual(response.status_code, 404) # Test that unknown routes 404
+        response = self.client.get(
+            "/history/show/blahblah-non-existant-page",
+            app.config['WIKI_SUBDOMAIN']
+        )
+        # Test that unknown routes 404
+        self.assertEqual(response.status_code, 404)
 
     def test_wiki_diff(self):
         """Test whether invalid revision IDs error"""
         response = self.client.get("/history/compare/ABC/XYZ", app.config['WIKI_SUBDOMAIN'])
-        self.assertEqual(response.status_code, 404) # Test that unknown revisions 404
+        # Test that unknown revisions 404
+        self.assertEqual(response.status_code, 404)
 
     def test_wiki_special(self):
         """Test whether invalid revision IDs error"""
