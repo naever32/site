@@ -11,9 +11,8 @@ GET_SCHEMA = Schema({
 })
 
 POST_SCHEMA = Schema({
-    'content': And(str, len, error="Announcement content must be a non-empty string"),
     'title': And(str, len, error="Announcement title must be a non-empty string"),
-    Optional('public'): bool
+    'content_md': And(str, len, error="Announcement content must be a non-empty string")
 })
 
 DELETE_SCHEMA = Schema({
@@ -36,7 +35,9 @@ class AnnouncementManagementAPI(APIView, DBMixin, RMQMixin):
             {
                 'id': 'my-announcement-id',
                 'title': "Totally a serious announcement",
-                'content': "Example announcement content"
+                'content_md': "Example announcement content"
+                'content_html': "Example announcement content"
+                'content_rst': "Example announcement content"
             },
             ...
         ]
@@ -48,7 +49,9 @@ class AnnouncementManagementAPI(APIView, DBMixin, RMQMixin):
         {
             'id': 'totally-random-sequence-of-characters',
             'title': "Definitely not an example announcement",
-            'content': "Absolutely meaningful and interesting content"
+            'content_md': "Absolutely meaningful and interesting content"
+            'content_rst': "I have no idea how to write RST",
+            'content_html': ... # <rendered RST>
         }
         If no announcement with the given ID was found,
         returns an empty dictionary:
@@ -70,25 +73,31 @@ class AnnouncementManagementAPI(APIView, DBMixin, RMQMixin):
 
     @api_key
     @api_params(schema=POST_SCHEMA, validation_type=ValidationTypes.json)
-    def post(self, announcement: dict):
+    def post(self, data: dict):
         """
-        Add a new announcement to the database.
+        Add a new announcement draft to the database.
 
         This endpoint expects data in the following format:
         {
-            'content': str # The announcement content, Markdown is supported
-            'title': str  # The announcement title, a non-empty string,
-            'public': bool  # Whether the announcement is public. Optional, defaults to False.
+            'content_md': str # The announcement content for the initial draft, as Markdown.
+            'title': str  # The announcement title, a non-empty string
         }
 
         Data must be provided as JSON.
         API key must be provided as header.
         """
 
-        announcement.setdefault('public', False)
+        data = {
+            'title': data['title'],
+            'content_md': data['content_md'],
+            'content_rst': "",
+            'content_html': "",
+            'public': False
+        }
+
         result = self.db.insert(
             self.table_name,
-            announcement,
+            data,
             return_changes=True
         )
         return jsonify({

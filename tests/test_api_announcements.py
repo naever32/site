@@ -39,7 +39,7 @@ class EmptyDatabaseAnnouncementLookup(SiteTest):
 class AnnouncementCreation(SiteTest):
     announcement_data = {
         'title': "On the health effects of eating raw lemons",
-        'content': "For years, experts have wondered about effects of eating uncooked lemons."
+        'content_md': "For years, experts have wondered about effects of eating *uncooked* lemons."
     }
 
     def setUp(self):
@@ -66,8 +66,10 @@ class AnnouncementCreation(SiteTest):
 
         self.assert200(response)
         self.assertEqual(response.json['title'], self.announcement_data['title'])
-        self.assertEqual(response.json['content'], self.announcement_data['content'])
+        self.assertEqual(response.json['content_md'], self.announcement_data['content_md'])
         self.assertFalse(response.json['public'])
+        self.assertFalse(response.json['content_rst'])
+        self.assertFalse(response.json['content_html'])
         self.assertEqual(response.json['id'], self.created_id)
 
     def test_announcement_in_all_announcements(self):
@@ -84,7 +86,7 @@ class AnnouncementCreation(SiteTest):
 class AnnouncementDeletion(SiteTest):
     announcement_data = {
         'title': "On the health effects of eating raw lemons",
-        'content': "For years, experts have wondered about effects of eating uncooked lemons."
+        'content_md': "For years, experts have wondered about effects of eating *uncooked* lemons."
     }
 
     def setUp(self):
