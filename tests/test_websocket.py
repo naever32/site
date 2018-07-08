@@ -1,5 +1,6 @@
 from tests import SiteTest
 
+
 class TestWebsocketEcho(SiteTest):
     """ Test cases for the echo endpoint """
     def testEcho(self):
