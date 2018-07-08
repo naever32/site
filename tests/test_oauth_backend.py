@@ -1,5 +1,6 @@
 from tests import SiteTest, manager
 
+
 class TestOAuthBackend(SiteTest):
     """ Test cases for the oauth.py file """
 
@@ -22,8 +23,17 @@ class TestOAuthBackend(SiteTest):
         from pysite.constants import OAUTH_DATABASE
 
         sess_id = "hey bro wazup"
-        fake_token = {"access_token": "access_token", "id": sess_id, "refresh_token": "refresh_token", "expires_at": 5}
-        fake_user = {"id": 1235678987654321, "username": "Zwacky", "discriminator": "#6660"}
+        fake_token = {
+            "access_token": "access_token",
+            "id": sess_id,
+            "refresh_token": "refresh_token",
+            "expires_at": 5
+        }
+        fake_user = {
+            "id": 1235678987654321,
+            "username": "Zwacky",
+            "discriminator": "#6660"
+        }
         manager.db.conn = manager.db.get_connection()
         manager.oauth_backend.add_user(fake_token, fake_user, sess_id)
 
