@@ -1,7 +1,10 @@
+from pysite.constants import (
+    DISCORD_OAUTH_AUTHORIZED,
+    DISCORD_OAUTH_REDIRECT,
+    ERROR_DESCRIPTIONS
+)
 from tests import SiteTest
-from pysite.constants import DISCORD_OAUTH_REDIRECT
-from pysite.constants import DISCORD_OAUTH_AUTHORIZED
-from pysite.constants import ERROR_DESCRIPTIONS
+
 
 class RootEndpoint(SiteTest):
     """ Test cases for the root endpoint and error handling """
