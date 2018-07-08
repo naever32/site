@@ -6,8 +6,8 @@ import os
 from flask import Blueprint, Flask, _request_ctx_stack
 from flask_dance.contrib.discord import make_discord_blueprint
 from flask_sockets import Sockets
-from gunicorn_config import _when_ready as when_ready
 
+from gunicorn_config import _when_ready as when_ready
 from pysite.base_route import APIView, BaseView, ErrorView, RedirectView, RouteView, TemplateView
 from pysite.constants import (
     CSRF, DEBUG_MODE, DISCORD_OAUTH_AUTHORIZED, DISCORD_OAUTH_ID, DISCORD_OAUTH_REDIRECT,
