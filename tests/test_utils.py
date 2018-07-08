@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 
-from tests import SiteTest
 from pysite.utils.time import is_expired, parse_duration
+from tests import SiteTest
 
 
 class DurationParsingTests(SiteTest):
