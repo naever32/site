@@ -69,3 +69,33 @@ class BigBrotherView(APIView, DBMixin):
         else:
             data = self.db.pluck(self.table_name, ('user_id', 'channel_id')) or []
             return jsonify(data)
+
+    @api_key
+    @api_params(schema=POST_SCHEMA, validation_type=ValidationTypes.json)
+    def post(self, data):
+        """
+        Adds a new entry to the database.
+        Entries take the following form:
+        {
+            "user_id": ...,  # The user ID of the user being monitored as an integer.
+            "channel_id": ...  # The channel ID the user's messages will be relayed to as an integer.
+        }
+
+        If an entry for the given `user_id` already exists, it will be updated with the new channel ID.
+
+        Returns 204 (ok, empty response) on success.
+
+        Data must be provided as JSON.
+        API key must be provided as header.
+        """
+
+        self.db.insert(
+            self.table_name,
+            {
+                'user_id': data['user_id'],
+                'channel_id': data['channel_id']
+            },
+            conflict='update'
+        )
+
+        return '', 204
