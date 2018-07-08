@@ -1,4 +1,3 @@
-import json
 import os
 
 from flask import Blueprint
@@ -11,8 +10,8 @@ os.environ["DATADOG_ADDRESS"] = 'localhost'  # satisfies coverage
 if "FLASK_DEBUG" in os.environ:
     del os.environ["FLASK_DEBUG"]  # Some unit tests fail if this is set
 
-from app import manager
-from gunicorn_config import _when_ready as when_ready
+from app import manager  # noqa
+from gunicorn_config import _when_ready as when_ready  # noqa
 
 when_ready()
 
