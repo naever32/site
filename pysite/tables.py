@@ -13,7 +13,9 @@ TABLES = {
         keys=sorted([
             "id",
             "title",
-            "content",
+            "content_rst",  # RST content: Displayed on the site
+            "content_html",  # HTML: the rendered RST, displayed on the site
+            "content_md",  # Markdown: The announcement on Discord
             "public"
         ])
     ),
