@@ -11,16 +11,16 @@ from pysite.mixins import DBMixin
 
 GET_SCHEMA = Schema({
     # This is passed as a GET parameter, so it has to be a string
-    Optional('user_id'): And(str, str.isnumeric, error="`user_id` must be numeric")
+    Optional('user_id'): And(str, str.isnumeric, error="`user_id` must be a numeric string")
 })
 
 POST_SCHEMA = Schema({
-    'user_id': int,
-    'channel_id': int
+    'user_id': And(str, str.isnumeric, error="`user_id` must be a numeric string"),
+    'channel_id': And(str, str.isnumeric, error="`channel_id` must be a numeric string")
 })
 
 DELETE_SCHEMA = Schema({
-    'user_id': And(str, str.isnumeric, error="`user_id` must be numeric")
+    'user_id': And(str, str.isnumeric, error="`user_id` must be a numeric string")
 })
 
 
@@ -58,7 +58,7 @@ class BigBrotherView(APIView, DBMixin):
 
         user_id = params.get('user_id')
         if user_id is not None:
-            data = self.db.get(self.table_name, int(user_id))
+            data = self.db.get(self.table_name, user_id)
             if data is None:
                 return NOT_FOUND_JSON, 404
             return jsonify(data)
@@ -74,8 +74,8 @@ class BigBrotherView(APIView, DBMixin):
         Adds a new entry to the database.
         Entries take the following form:
         {
-            "user_id": ...,  # The user ID of the user being monitored, as an integer.
-            "channel_id": ...  # The channel ID that the user's messages will be relayed to, as an integer.
+            "user_id": ...,  # The user ID of the user being monitored, as a string.
+            "channel_id": ...  # The channel ID that the user's messages will be relayed to, as a string.
         }
 
         If an entry for the given `user_id` already exists, it will be updated with the new channel ID.

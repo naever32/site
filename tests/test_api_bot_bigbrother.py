@@ -25,8 +25,8 @@ class EmptyDatabaseEndpointTests(SiteTest):
 
 class AddingAnEntryEndpointTests(SiteTest):
     GOOD_DATA = {
-        'user_id': 42,
-        'channel_id': 55
+        'user_id': '42',
+        'channel_id': '55'
     }
     GOOD_DATA_JSON = json.dumps(GOOD_DATA)
 
@@ -60,13 +60,13 @@ class AddingAnEntryEndpointTests(SiteTest):
 
 class UpdatingAnEntryEndpointTests(SiteTest):
     ORIGINAL_DATA = {
-        'user_id': 300,
-        'channel_id': 400
+        'user_id': '300',
+        'channel_id': '400'
     }
     ORIGINAL_DATA_JSON = json.dumps(ORIGINAL_DATA)
     UPDATED_DATA = {
-        'user_id': 300,
-        'channel_id': 500
+        'user_id': '300',
+        'channel_id': '500'
     }
     UPDATED_DATA_JSON = json.dumps(UPDATED_DATA)
 
@@ -91,8 +91,8 @@ class UpdatingAnEntryEndpointTests(SiteTest):
 
 class DeletingAnEntryEndpointTests(SiteTest):
     SAMPLE_DATA = {
-        'user_id': 101,
-        'channel_id': 202
+        'user_id': '101',
+        'channel_id': '202'
     }
     SAMPLE_DATA_JSON = json.dumps(SAMPLE_DATA)
 
@@ -128,7 +128,7 @@ class SchemaValidationTests(SiteTest):
     def test_post_with_invalid_data_returns_400(self):
         bad_data_json = json.dumps({
             'user_id': "I'M A NUMBER I SWEAR",
-            'channel_id': 42
+            'channel_id': '42'
         })
 
         response = self.client.post(
