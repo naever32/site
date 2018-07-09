@@ -6,6 +6,7 @@ import os
 from flask import Blueprint, Flask, _request_ctx_stack
 from flask_dance.contrib.discord import make_discord_blueprint
 from flask_sockets import Sockets
+from flask_sqlalchemy import SQLAlchemy
 from gunicorn_config import _when_ready as when_ready
 
 from pysite.base_route import APIView, BaseView, ErrorView, RedirectView, RouteView, TemplateView
@@ -33,12 +34,15 @@ class RouteManager:
         self.log = logging.getLogger(__name__)
         self.app.secret_key = os.environ.get("WEBPAGE_SECRET_KEY", "super_secret")
         self.app.config["SERVER_NAME"] = os.environ.get("SERVER_NAME", "pythondiscord.local:8080")
+        self.app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///:memory")
         self.app.config["PREFERRED_URL_SCHEME"] = PREFERRED_URL_SCHEME
         self.app.config["WTF_CSRF_CHECK_DEFAULT"] = False  # We only want to protect specific routes
 
         # Trim blocks so that {% block %} statements in templates don't generate blank lines
         self.app.jinja_env.trim_blocks = True
         self.app.jinja_env.lstrip_blocks = True
+
+        self.postgres = SQLAlchemy(self.app)
 
         # We make the token valid for the lifetime of the session because of the wiki - you might spend some
         # time editing an article, and it seems that session lifetime is a good analogue for how long you have
