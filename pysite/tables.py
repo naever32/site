@@ -257,5 +257,19 @@ TABLES = {
             "key",  # str
             "value"  # any
         ])
+    ),
+
+    "bot_infractions": Table(
+        primary_key="id",
+        keys=sorted([
+            "id",  # str
+            "user_id",  # str
+            "actor_id",  # str
+            "reason",  # str
+            "type"  # str
+            "inserted_at",  # datetime
+            "expires_at",  # datetime
+            "active"  # bool
+        ])
     )
 }
