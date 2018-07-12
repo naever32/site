@@ -10,7 +10,7 @@ from pysite.mixins import DBMixin
 """
 INFRACTIONS API
 
-All "GET" endpoints in this API take the following optional parameters:
+"GET" endpoints in this API may take the following optional parameters, depending on the endpoint:
   - active: filters infractions that are active (true), expired (false), or either (not present/any)
   - expand: expands the result data with the information about the users (slower)
 
@@ -18,19 +18,43 @@ Endpoints:
 
   GET /bot/infractions
     Gets a list of all infractions, regardless of type or user.
+    Parameters: "active", "expand".
+    This endpoint returns an array of infraction objects.
 
   GET /bot/infractions/user/<user_id>
     Gets a list of all infractions for a user.
+    Parameters: "active", "expand".
+    This endpoint returns an array of infraction objects.
 
   GET /bot/infractions/type/<type>
     Gets a list of all infractions of the given type (ban, mute, etc.)
+    Parameters: "active", "expand".
+    This endpoint returns an array of infraction objects.
 
   GET /bot/infractions/user/<user_id>/<type>
     Gets a list of all infractions of the given type for a user.
+    Parameters: "active", "expand".
+    This endpoint returns an array of infraction objects.
+
+  GET /bot/infractions/user/user_id>/<type>/current
+    Gets the active infraction (if any) of the given type for a user.
+    Parameters: "expand".
+    This endpoint returns an object with the "infraction" key, which is either set to null (no infraction)
+      or the query's corresponding infraction.
+
+  GET /bot/infractions/id/<infraction_id>
+    Gets the infraction (if any) for the given ID.
+    Parameters: "expand".
+    This endpoint returns an object with the "infraction" key, which is either set to null (no infraction)
+      or the infraction corresponding to the ID.
 """
 
 GET_SCHEMA = Schema({
     Optional("active"): str,
+    Optional("expand"): str
+})
+
+GET_ACTIVE_SCHEMA = Schema({
     Optional("expand"): str
 })
 
@@ -43,6 +67,25 @@ class ListInfractionsView(APIView, DBMixin):
     @api_params(schema=GET_SCHEMA, validation_type=ValidationTypes.params)
     def get(self, params=None):
         return _infraction_list_filtered(self, params, {})
+
+
+class InfractionById(APIView, DBMixin):
+    path = "/bot/infractions/id/<string:infraction_id>"
+    name = "bot.infractions.id"
+    table_name = "bot_infractions"
+
+    @api_params(schema=GET_ACTIVE_SCHEMA, validation_type=ValidationTypes.params)
+    def get(self, params, infraction_id):
+        params = params or {}
+        expand = parse_bool(params.get("expand"), default=False)
+
+        query = self.db.query(self.table_name).get(infraction_id) \
+            .merge(_merge_expand_users(self, expand)) \
+            .merge(_merge_active_check()) \
+            .without("user_id", "actor_id").default(None)
+        return jsonify({
+            "infraction": self.db.run(query)
+        })
 
 
 class ListInfractionsByUserView(APIView, DBMixin):
@@ -82,6 +125,28 @@ class ListInfractionsByTypeAndUserView(APIView, DBMixin):
         })
 
 
+class CurrentInfractionByTypeAndUserView(APIView, DBMixin):
+    path = "/bot/infractions/user/<string:user_id>/<string:type>/current"
+    name = "bot.infractions.user.type.current"
+    table_name = "bot_infractions"
+
+    @api_params(schema=GET_ACTIVE_SCHEMA, validation_type=ValidationTypes.params)
+    def get(self, params, user_id, type):
+        params = params or {}
+        expand = parse_bool(params.get("expand"), default=False)
+
+        query_filter = {
+            "user_id": user_id,
+            "type": type
+        }
+        query = _merged_query(self, expand, query_filter).filter({
+            "active": True
+        }).limit(1).nth(0).default(None)
+        return jsonify({
+            "infraction": self.db.run(query)
+        })
+
+
 def _infraction_list_filtered(view, params=None, query_filter=None):
     params = params or {}
     query_filter = query_filter or {}
@@ -91,9 +156,13 @@ def _infraction_list_filtered(view, params=None, query_filter=None):
     if active is not None:
         query_filter["active"] = active
 
-    query = view.db.query(view.table_name).merge(_merge_active_check()).filter(query_filter) \
-        .merge(_merge_expand_users(view, expand)).without("user_id", "actor_id")
+    query = _merged_query(view, expand, query_filter)
     return jsonify(view.db.run(query.coerce_to("array")))
+
+
+def _merged_query(view, expand, query_filter):
+    return view.db.query(view.table_name).merge(_merge_active_check()).filter(query_filter) \
+        .merge(_merge_expand_users(view, expand)).without("user_id", "actor_id")
 
 
 def _merge_active_check():
