@@ -63,6 +63,7 @@ Endpoints:
     "actor_id" (str): the Discord ID of the user who submitted the infraction.
     "duration" (optional int): the duration, in seconds, of the infraction. This is ignored for infractions
       which are not duration-based. For other infraction types, omitting this field may imply permanence.
+    "expand" (optional bool): whether to expand the infraction user data once the infraction is inserted and returned.
 """
 
 
@@ -92,7 +93,8 @@ CREATE_INFRACTION_SCHEMA = Schema({
     "reason": str,
     "user_id": str,  # Discord user ID
     "actor_id": str,  # Discord user ID
-    Optional("duration"): int  # In seconds. If not provided, may imply permanence depending on the infraction
+    Optional("duration"): int,  # In seconds. If not provided, may imply permanence depending on the infraction
+    Optional("expand"): bool
 })
 
 
@@ -114,6 +116,7 @@ class InfractionsView(APIView, DBMixin):
         actor_id = data["actor_id"]
         reason = data["reason"]
         duration = data.get("duration")
+        expand = data.get("expand")
         expires_at = None
         inserted_at = datetime.datetime.now(tz=datetime.timezone.utc)
 
@@ -144,12 +147,18 @@ class InfractionsView(APIView, DBMixin):
             "expires_at": expires_at
         }
 
-        self.db.insert(self.table_name, infraction_insert_doc)
+        infraction_id = self.db.insert(self.table_name, infraction_insert_doc)["generated_keys"][0]
 
         if deactivate_infraction_query:
             self.db.run(deactivate_infraction_query)
 
-        return jsonify(data)
+        query = self.db.query(self.table_name).get(infraction_id) \
+            .merge(_merge_expand_users(self, expand)) \
+            .merge(_merge_active_check()) \
+            .without("user_id", "actor_id").default(None)
+        return jsonify({
+            "infraction": self.db.run(query)
+        })
 
 
 class InfractionById(APIView, DBMixin):
