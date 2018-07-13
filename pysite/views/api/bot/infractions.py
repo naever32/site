@@ -1,3 +1,6 @@
+import datetime
+from typing import NamedTuple
+
 import rethinkdb
 from flask import jsonify
 from schema import Optional, Schema
@@ -6,6 +9,8 @@ from pysite.base_route import APIView
 from pysite.constants import ValidationTypes
 from pysite.decorators import api_params
 from pysite.mixins import DBMixin
+
+# todo: add @api_key annotation to all methods!
 
 """
 INFRACTIONS API
@@ -40,14 +45,38 @@ Endpoints:
     Gets the active infraction (if any) of the given type for a user.
     Parameters: "expand".
     This endpoint returns an object with the "infraction" key, which is either set to null (no infraction)
-      or the query's corresponding infraction.
+      or the query's corresponding infraction. It will not return an infraction if the type of the infraction
+      isn't duration-based (e.g. kick, warning, etc.)
 
   GET /bot/infractions/id/<infraction_id>
     Gets the infraction (if any) for the given ID.
     Parameters: "expand".
     This endpoint returns an object with the "infraction" key, which is either set to null (no infraction)
       or the infraction corresponding to the ID.
+
+  POST /bot/infractions
+  Creates an infraction for a user.
+  Parameters (JSON payload):
+    "type" (str): the type of the infraction (must be a valid infraction type).
+    "reason" (str): the reason of the infraction.
+    "user_id" (str): the Discord ID of the user who is being given the infraction.
+    "actor_id" (str): the Discord ID of the user who submitted the infraction.
+    "duration" (optional int): the duration, in seconds, of the infraction. This is ignored for infractions
+      which are not duration-based. For other infraction types, omitting this field may imply permanence.
 """
+
+
+class InfractionType(NamedTuple):
+    timed_infraction: bool  # whether the infraction is active until it expires.
+
+
+INFRACTION_TYPES = {
+    "warning": InfractionType(timed_infraction=False),
+    "mute": InfractionType(timed_infraction=True),
+    "ban": InfractionType(timed_infraction=True),
+    "kick": InfractionType(timed_infraction=False),
+    "softban": InfractionType(timed_infraction=False)
+}
 
 GET_SCHEMA = Schema({
     Optional("active"): str,
@@ -58,8 +87,16 @@ GET_ACTIVE_SCHEMA = Schema({
     Optional("expand"): str
 })
 
+CREATE_INFRACTION_SCHEMA = Schema({
+    "type": lambda tp: tp in INFRACTION_TYPES,
+    "reason": str,
+    "user_id": str,  # Discord user ID
+    "actor_id": str,  # Discord user ID
+    Optional("duration"): int  # In seconds. If not provided, may imply permanence depending on the infraction
+})
 
-class ListInfractionsView(APIView, DBMixin):
+
+class InfractionsView(APIView, DBMixin):
     path = "/bot/infractions"
     name = "bot.infractions"
     table_name = "bot_infractions"
@@ -67,6 +104,52 @@ class ListInfractionsView(APIView, DBMixin):
     @api_params(schema=GET_SCHEMA, validation_type=ValidationTypes.params)
     def get(self, params=None):
         return _infraction_list_filtered(self, params, {})
+
+    @api_params(schema=CREATE_INFRACTION_SCHEMA, validation_type=ValidationTypes.json)
+    def post(self, data):
+        deactivate_infraction_query = None
+
+        infraction_type = data["type"]
+        user_id = data["user_id"]
+        actor_id = data["actor_id"]
+        reason = data["reason"]
+        duration = data.get("duration")
+        expires_at = None
+        inserted_at = datetime.datetime.now(tz=datetime.timezone.utc)
+
+        # check if the user already has an active infraction of this type
+        # if so, we need to disable that infraction and create a new infraction
+        if INFRACTION_TYPES[infraction_type].timed_infraction:
+            active_infraction_query = \
+                self.db.query(self.table_name).merge(_merge_active_check()) \
+                    .filter({"user_id": user_id, "type": infraction_type, "active": True}) \
+                    .limit(1).nth(0).default(None)
+
+            active_infraction = self.db.run(active_infraction_query)
+            if active_infraction:
+                deactivate_infraction_query = \
+                    self.db.query(self.table_name) \
+                        .get(active_infraction["id"]) \
+                        .update({"active": False})
+
+            if duration:
+                expires_at = inserted_at + datetime.timedelta(seconds=duration)
+
+        infraction_insert_doc = {
+            "actor_id": actor_id,
+            "user_id": user_id,
+            "type": infraction_type,
+            "reason": reason,
+            "inserted_at": inserted_at,
+            "expires_at": expires_at
+        }
+
+        self.db.insert(self.table_name, infraction_insert_doc)
+
+        if deactivate_infraction_query:
+            self.db.run(deactivate_infraction_query)
+
+        return jsonify(data)
 
 
 class InfractionById(APIView, DBMixin):
@@ -170,15 +253,20 @@ def _merge_active_check():
     # If not, the "active" field is set to whether the infraction has expired.
     def _merge(row):
         return {
-            "active": rethinkdb.branch(
-                row["active"].default(True).eq(False),
-                False,
+            "active":
                 rethinkdb.branch(
-                    row["expires_at"].eq(None),
-                    True,
-                    row["expires_at"] > rethinkdb.now()
+                    _is_timed_infraction(row["type"]),
+                    rethinkdb.branch(
+                        row["active"].default(True).eq(False),
+                        False,
+                        rethinkdb.branch(
+                            row["expires_at"].eq(None),
+                            True,
+                            row["expires_at"] > rethinkdb.now()
+                        )
+                    ),
+                    False
                 )
-            )
         }
 
     return _merge
@@ -206,6 +294,20 @@ def _merge_expand_users(view, expand):
         }
 
     return _merge
+
+
+def _is_timed_infraction(type_var):
+    # this method generates an ReQL expression to check if the given type
+    # is a "timed infraction" (i.e it can expire or be permanent)
+
+    timed_infractions = filter(lambda key: INFRACTION_TYPES[key].timed_infraction, INFRACTION_TYPES.keys())
+    expr = None
+    for infra_type in timed_infractions:
+        if expr is None:
+            expr = type_var.eq(infra_type)
+        else:
+            expr = expr | type_var.eq(infra_type)
+    return expr
 
 
 def parse_bool(a_string, default=None):
