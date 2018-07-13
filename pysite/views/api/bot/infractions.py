@@ -310,7 +310,7 @@ def _is_timed_infraction(type_var):
     # is a "timed infraction" (i.e it can expire or be permanent)
 
     timed_infractions = filter(lambda key: INFRACTION_TYPES[key].timed_infraction, INFRACTION_TYPES.keys())
-    expr = None
+    expr = rethinkdb.expr(False)
     for infra_type in timed_infractions:
         if expr is None:
             expr = type_var.eq(infra_type)
