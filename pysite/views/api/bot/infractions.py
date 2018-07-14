@@ -64,6 +64,17 @@ Endpoints:
     "duration" (optional int): the duration, in seconds, of the infraction. This is ignored for infractions
       which are not duration-based. For other infraction types, omitting this field may imply permanence.
     "expand" (optional bool): whether to expand the infraction user data once the infraction is inserted and returned.
+
+  PATCH /bot/infractions
+  Updates an infractions.
+  Parameters (JSON payload):
+    "id" (str): the ID of the infraction to update.
+    "reason" (optional str): if provided, the new reason for the infraction.
+    "duration" (optional int): if provided, updates the expiration of the infraction to the time of UPDATING
+      plus the duration in seconds.
+    "active" (optional bool): if provided, activates or deactivates the infraction. This does not do anything
+      if the infraction isn't duration-based, or if the infraction has already expired.
+    "expand" (optional bool): whether to expand the infraction user data once the infraction is updated and returned.
 """
 
 
@@ -95,6 +106,13 @@ CREATE_INFRACTION_SCHEMA = Schema({
     "actor_id": str,  # Discord user ID
     Optional("duration"): int,  # In seconds. If not provided, may imply permanence depending on the infraction
     Optional("expand"): bool
+})
+
+UPDATE_INFRACTION_SCHEMA = Schema({
+    "id": str,
+    Optional("reason"): str,
+    Optional("duration"): int,
+    Optional("active"): bool
 })
 
 
@@ -158,6 +176,44 @@ class InfractionsView(APIView, DBMixin):
             .without("user_id", "actor_id").default(None)
         return jsonify({
             "infraction": self.db.run(query)
+        })
+
+    @api_params(schema=UPDATE_INFRACTION_SCHEMA, validation_type=ValidationTypes.json)
+    def patch(self, data):
+        expand = data.get("expand")
+        update_collection = {
+            "id": data["id"]
+        }
+
+        if "reason" in data:
+            update_collection["reason"] = data["reason"]
+
+        if "active" in data:
+            update_collection["active"] = data["active"]
+
+        if "duration" in data:
+            current_time = datetime.datetime.now(tz=datetime.timezone.utc)
+            duration = data["duration"]
+            update_collection["expires_at"] = current_time + datetime.timedelta(seconds=duration)
+
+        query_update = self.db.query(self.table_name).update(update_collection)
+        result_update = self.db.run(query_update)
+
+        if not result_update["replaced"]:
+            return jsonify({
+                "success": False
+            })
+
+        # return the updated infraction
+        query = self.db.query(self.table_name).get(data["id"]) \
+            .merge(_merge_expand_users(self, expand)) \
+            .merge(_merge_active_check()) \
+            .without("user_id", "actor_id").default(None)
+        infraction = self.db.run(query)
+
+        return jsonify({
+            "infraction": infraction,
+            "success": True
         })
 
 
