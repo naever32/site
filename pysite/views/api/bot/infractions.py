@@ -19,6 +19,29 @@ INFRACTIONS API
   - active: filters infractions that are active (true), expired (false), or either (not present/any)
   - expand: expands the result data with the information about the users (slower)
 
+Infraction Schema:
+  This schema is used when an infraction's data is returned.
+
+  Root object:
+    "id" (str): the UUID of the infraction.
+    "inserted_at" (str): the date and time of the creation of this infraction (RFC1123 format).
+    "expires_at" (str): the date and time of the expiration of this infraction (RC1123 format), may be null.
+      The significance of this field being null depends on the type of infraction. Duration-based infractions
+      have a "null" expiration if they are permanent. Other infraction types do not have expirations.
+    "active" (bool): whether the infraction is still active. Note that the check for expiration of
+      duration-based infractions is done by the API, so you should check for expiration using this "active" field.
+    "user" (object): the user to which the infraction was applied.
+      "user_id" (str): the Discord ID of the user.
+      "username" (optional str): the username of the user. This field is only present if the query was expanded.
+      "discriminator" (optional int): the username discriminator of the user. This field is only present if the
+        query was expanded.
+      "avatar" (optional str): the avatar URL of the user. This field is only present if the query was expanded.
+    "actor" (object): the user which applied the infraction.
+      This object uses the same schema as the "user" field.
+    "type" (str): the type of the infraction.
+    "reason" (str): the reason for the infraction.
+
+
 Endpoints:
 
   GET /bot/infractions
@@ -41,7 +64,7 @@ Endpoints:
     Parameters: "active", "expand".
     This endpoint returns an array of infraction objects.
 
-  GET /bot/infractions/user/user_id>/<type>/current
+  GET /bot/infractions/user/<user_id>/<type>/current
     Gets the active infraction (if any) of the given type for a user.
     Parameters: "expand".
     This endpoint returns an object with the "infraction" key, which is either set to null (no infraction)
@@ -55,26 +78,26 @@ Endpoints:
       or the infraction corresponding to the ID.
 
   POST /bot/infractions
-  Creates an infraction for a user.
-  Parameters (JSON payload):
-    "type" (str): the type of the infraction (must be a valid infraction type).
-    "reason" (str): the reason of the infraction.
-    "user_id" (str): the Discord ID of the user who is being given the infraction.
-    "actor_id" (str): the Discord ID of the user who submitted the infraction.
-    "duration" (optional int): the duration, in seconds, of the infraction. This is ignored for infractions
-      which are not duration-based. For other infraction types, omitting this field may imply permanence.
-    "expand" (optional bool): whether to expand the infraction user data once the infraction is inserted and returned.
+    Creates an infraction for a user.
+    Parameters (JSON payload):
+      "type" (str): the type of the infraction (must be a valid infraction type).
+      "reason" (str): the reason of the infraction.
+      "user_id" (str): the Discord ID of the user who is being given the infraction.
+      "actor_id" (str): the Discord ID of the user who submitted the infraction.
+      "duration" (optional int): the duration, in seconds, of the infraction. This is ignored for infractions
+        which are not duration-based. For other infraction types, omitting this field may imply permanence.
+      "expand" (optional bool): whether to expand the infraction user data once the infraction is inserted and returned.
 
   PATCH /bot/infractions
-  Updates an infractions.
-  Parameters (JSON payload):
-    "id" (str): the ID of the infraction to update.
-    "reason" (optional str): if provided, the new reason for the infraction.
-    "duration" (optional int): if provided, updates the expiration of the infraction to the time of UPDATING
-      plus the duration in seconds.
-    "active" (optional bool): if provided, activates or deactivates the infraction. This does not do anything
-      if the infraction isn't duration-based, or if the infraction has already expired.
-    "expand" (optional bool): whether to expand the infraction user data once the infraction is updated and returned.
+    Updates an infractions.
+    Parameters (JSON payload):
+      "id" (str): the ID of the infraction to update.
+      "reason" (optional str): if provided, the new reason for the infraction.
+      "duration" (optional int): if provided, updates the expiration of the infraction to the time of UPDATING
+        plus the duration in seconds.
+      "active" (optional bool): if provided, activates or deactivates the infraction. This does not do anything
+        if the infraction isn't duration-based, or if the infraction has already expired.
+      "expand" (optional bool): whether to expand the infraction user data once the infraction is updated and returned.
 """
 
 
