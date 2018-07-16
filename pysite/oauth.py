@@ -21,7 +21,7 @@ class OAuthBackend(BaseBackend):
         pysite.mixins.DBmixin
 
     Properties:
-        key: The app's secret, we use it too make session IDs
+        key: The app's secret, we use it to make session IDs
     """
 
     def __init__(self, manager):

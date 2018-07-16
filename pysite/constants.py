@@ -55,6 +55,7 @@ DISCORD_OAUTH_SCOPE = 'identify'
 OAUTH_DATABASE = "oauth_data"
 
 GITLAB_ACCESS_TOKEN = environ.get("GITLAB_ACCESS_TOKEN", '')
+GITLAB_OAUTH_REDIRECT = "/oauth/authorize"
 
 PREFERRED_URL_SCHEME = environ.get("PREFERRED_URL_SCHEME", "http")
 
