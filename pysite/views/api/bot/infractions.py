@@ -1,17 +1,3 @@
-import datetime
-from typing import NamedTuple
-
-import rethinkdb
-from flask import jsonify
-from schema import Optional, Schema
-
-from pysite.base_route import APIView
-from pysite.constants import ValidationTypes
-from pysite.decorators import api_params
-from pysite.mixins import DBMixin
-
-# todo: add @api_key annotation to all methods!
-
 """
 INFRACTIONS API
 
@@ -84,7 +70,7 @@ Endpoints:
       "reason" (str): the reason of the infraction.
       "user_id" (str): the Discord ID of the user who is being given the infraction.
       "actor_id" (str): the Discord ID of the user who submitted the infraction.
-      "duration" (optional int): the duration, in seconds, of the infraction. This is ignored for infractions
+      "duration" (optional str): the duration of the infraction. This is ignored for infractions
         which are not duration-based. For other infraction types, omitting this field may imply permanence.
       "expand" (optional bool): whether to expand the infraction user data once the infraction is inserted and returned.
 
@@ -93,12 +79,25 @@ Endpoints:
     Parameters (JSON payload):
       "id" (str): the ID of the infraction to update.
       "reason" (optional str): if provided, the new reason for the infraction.
-      "duration" (optional int): if provided, updates the expiration of the infraction to the time of UPDATING
-        plus the duration in seconds.
+      "duration" (optional str): if provided, updates the expiration of the infraction to the time of UPDATING
+        plus the duration.
       "active" (optional bool): if provided, activates or deactivates the infraction. This does not do anything
         if the infraction isn't duration-based, or if the infraction has already expired.
       "expand" (optional bool): whether to expand the infraction user data once the infraction is updated and returned.
 """
+
+import datetime
+from typing import NamedTuple
+
+import rethinkdb
+from flask import jsonify
+from schema import Optional, Schema
+
+from pysite.base_route import APIView
+from pysite.constants import ErrorCodes, ValidationTypes
+from pysite.decorators import api_key, api_params
+from pysite.mixins import DBMixin
+from pysite.utils.time import parse_duration
 
 
 class InfractionType(NamedTuple):
@@ -127,14 +126,14 @@ CREATE_INFRACTION_SCHEMA = Schema({
     "reason": str,
     "user_id": str,  # Discord user ID
     "actor_id": str,  # Discord user ID
-    Optional("duration"): int,  # In seconds. If not provided, may imply permanence depending on the infraction
+    Optional("duration"): str,  # If not provided, may imply permanence depending on the infraction
     Optional("expand"): bool
 })
 
 UPDATE_INFRACTION_SCHEMA = Schema({
     "id": str,
     Optional("reason"): str,
-    Optional("duration"): int,
+    Optional("duration"): str,
     Optional("active"): bool
 })
 
@@ -144,10 +143,12 @@ class InfractionsView(APIView, DBMixin):
     name = "bot.infractions"
     table_name = "bot_infractions"
 
+    @api_key
     @api_params(schema=GET_SCHEMA, validation_type=ValidationTypes.params)
     def get(self, params=None):
         return _infraction_list_filtered(self, params, {})
 
+    @api_key
     @api_params(schema=CREATE_INFRACTION_SCHEMA, validation_type=ValidationTypes.json)
     def post(self, data):
         deactivate_infraction_query = None
@@ -156,10 +157,13 @@ class InfractionsView(APIView, DBMixin):
         user_id = data["user_id"]
         actor_id = data["actor_id"]
         reason = data["reason"]
-        duration = data.get("duration")
+        duration_str = data.get("duration")
         expand = data.get("expand")
         expires_at = None
         inserted_at = datetime.datetime.now(tz=datetime.timezone.utc)
+
+        if infraction_type not in INFRACTION_TYPES:
+            return self.error(ErrorCodes.incorrect_parameters, "Invalid infraction type.")
 
         # check if the user already has an active infraction of this type
         # if so, we need to disable that infraction and create a new infraction
@@ -176,8 +180,14 @@ class InfractionsView(APIView, DBMixin):
                         .get(active_infraction["id"]) \
                         .update({"active": False})
 
-            if duration:
-                expires_at = inserted_at + datetime.timedelta(seconds=duration)
+            if duration_str:
+                try:
+                    expires_at = parse_duration(duration_str)
+                except ValueError:
+                    return self.error(
+                        ErrorCodes.incorrect_parameters,
+                        "Invalid duration format."
+                    )
 
         infraction_insert_doc = {
             "actor_id": actor_id,
@@ -201,6 +211,7 @@ class InfractionsView(APIView, DBMixin):
             "infraction": self.db.run(query)
         })
 
+    @api_key
     @api_params(schema=UPDATE_INFRACTION_SCHEMA, validation_type=ValidationTypes.json)
     def patch(self, data):
         expand = data.get("expand")
@@ -215,9 +226,14 @@ class InfractionsView(APIView, DBMixin):
             update_collection["active"] = data["active"]
 
         if "duration" in data:
-            current_time = datetime.datetime.now(tz=datetime.timezone.utc)
-            duration = data["duration"]
-            update_collection["expires_at"] = current_time + datetime.timedelta(seconds=duration)
+            duration_str = data["duration"]
+            try:
+                update_collection["expires_at"] = parse_duration(duration_str)
+            except ValueError:
+                return self.error(
+                    ErrorCodes.incorrect_parameters,
+                    "Invalid duration format."
+                )
 
         query_update = self.db.query(self.table_name).update(update_collection)
         result_update = self.db.run(query_update)
@@ -245,6 +261,7 @@ class InfractionById(APIView, DBMixin):
     name = "bot.infractions.id"
     table_name = "bot_infractions"
 
+    @api_key
     @api_params(schema=GET_ACTIVE_SCHEMA, validation_type=ValidationTypes.params)
     def get(self, params, infraction_id):
         params = params or {}
@@ -264,6 +281,7 @@ class ListInfractionsByUserView(APIView, DBMixin):
     name = "bot.infractions.user"
     table_name = "bot_infractions"
 
+    @api_key
     @api_params(schema=GET_SCHEMA, validation_type=ValidationTypes.params)
     def get(self, params, user_id):
         return _infraction_list_filtered(self, params, {
@@ -276,6 +294,7 @@ class ListInfractionsByTypeView(APIView, DBMixin):
     name = "bot.infractions.type"
     table_name = "bot_infractions"
 
+    @api_key
     @api_params(schema=GET_SCHEMA, validation_type=ValidationTypes.params)
     def get(self, params, type):
         return _infraction_list_filtered(self, params, {
@@ -288,6 +307,7 @@ class ListInfractionsByTypeAndUserView(APIView, DBMixin):
     name = "bot.infractions.user.type"
     table_name = "bot_infractions"
 
+    @api_key
     @api_params(schema=GET_SCHEMA, validation_type=ValidationTypes.params)
     def get(self, params, user_id, type):
         return _infraction_list_filtered(self, params, {
@@ -301,6 +321,7 @@ class CurrentInfractionByTypeAndUserView(APIView, DBMixin):
     name = "bot.infractions.user.type.current"
     table_name = "bot_infractions"
 
+    @api_key
     @api_params(schema=GET_ACTIVE_SCHEMA, validation_type=ValidationTypes.params)
     def get(self, params, user_id, type):
         params = params or {}
