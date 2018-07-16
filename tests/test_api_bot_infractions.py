@@ -93,3 +93,42 @@ class ApiBotInfractionsEndpoint(SiteTest):
         self.assert200(response)
         self.assertTrue("infraction" in response.json)
         self.assertIsNone(response.json["infraction"])
+
+        # Re-activate the ban
+        patch_data_valid = json.dumps(
+            {"id": infraction_id, "active": True}
+        )
+        response = self.client.patch("/bot/infractions", app.config["API_SUBDOMAIN"],
+                                     headers=app.config["TEST_HEADER"],
+                                     data=patch_data_valid)
+        self.assert200(response)
+        self.assertTrue("success" in response.json)
+        self.assertTrue("infraction" in response.json)
+        self.assertTrue(response.json["success"])
+        self.assertTrue(response.json["infraction"]["active"])
+
+        # Create a new ban
+        post_data_valid = json.dumps(
+            {"type": "ban", "reason": "baddie v2.0", "user_id": TEST_USER_ID, "actor_id": TEST_USER_ID}
+        )
+        response = self.client.post("/bot/infractions", app.config["API_SUBDOMAIN"],
+                                    headers=app.config["TEST_HEADER"],
+                                    data=post_data_valid)
+        self.assert200(response)
+        self.assertTrue("infraction" in response.json)
+        self.assertTrue("id" in response.json["infraction"])
+        new_infraction_id = response.json["infraction"]["id"]
+
+        # Check if the old ban is now disabled
+        response = self.client.get(f"/bot/infractions/id/{infraction_id}", app.config["API_SUBDOMAIN"],
+                                   headers=app.config["TEST_HEADER"])
+        self.assert200(response)
+        self.assertTrue("infraction" in response.json)
+        self.assertFalse(response.json["infraction"]["active"])
+
+        # Check if the current ban infraction is the new infraction
+        response = self.client.get(f"/bot/infractions/user/{TEST_USER_ID}/ban/current", app.config["API_SUBDOMAIN"],
+                                   headers=app.config["TEST_HEADER"])
+        self.assert200(response)
+        self.assertTrue("infraction" in response.json)
+        self.assertEqual(response.json["infraction"]["id"], new_infraction_id)
