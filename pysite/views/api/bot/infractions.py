@@ -80,7 +80,7 @@ Endpoints:
       "id" (str): the ID of the infraction to update.
       "reason" (optional str): if provided, the new reason for the infraction.
       "duration" (optional str): if provided, updates the expiration of the infraction to the time of UPDATING
-        plus the duration.
+        plus the duration. If set to null, the expiration is also set to null (may imply permanence).
       "active" (optional bool): if provided, activates or deactivates the infraction. This does not do anything
         if the infraction isn't duration-based, or if the infraction has already expired.
       "expand" (optional bool): whether to expand the infraction user data once the infraction is updated and returned.
@@ -91,7 +91,7 @@ from typing import NamedTuple
 
 import rethinkdb
 from flask import jsonify
-from schema import Optional, Schema
+from schema import Optional, Or, Schema
 
 from pysite.base_route import APIView
 from pysite.constants import ErrorCodes, ValidationTypes
@@ -133,9 +133,27 @@ CREATE_INFRACTION_SCHEMA = Schema({
 UPDATE_INFRACTION_SCHEMA = Schema({
     "id": str,
     Optional("reason"): str,
-    Optional("duration"): str,
+    Optional("duration"): Or(str, None),
     Optional("active"): bool
 })
+
+IMPORT_INFRACTIONS_SCHEMA = Schema([
+    {
+        "active": bool,
+        "actor": {
+            "id": str
+        },
+        "created_at": str,
+        "expires_at": Or(str, None),
+        "reason": Or(str, None),
+        "type": {
+            "name": str
+        },
+        "user": {
+            "id": str
+        }
+    }
+], ignore_extra_keys=True)
 
 
 class InfractionsView(APIView, DBMixin):
@@ -227,13 +245,16 @@ class InfractionsView(APIView, DBMixin):
 
         if "duration" in data:
             duration_str = data["duration"]
-            try:
-                update_collection["expires_at"] = parse_duration(duration_str)
-            except ValueError:
-                return self.error(
-                    ErrorCodes.incorrect_parameters,
-                    "Invalid duration format."
-                )
+            if duration_str is None:
+                update_collection["expires_at"] = None
+            else:
+                try:
+                    update_collection["expires_at"] = parse_duration(duration_str)
+                except ValueError:
+                    return self.error(
+                        ErrorCodes.incorrect_parameters,
+                        "Invalid duration format."
+                    )
 
         query_update = self.db.query(self.table_name).update(update_collection)
         result_update = self.db.run(query_update)
@@ -337,6 +358,16 @@ class CurrentInfractionByTypeAndUserView(APIView, DBMixin):
         return jsonify({
             "infraction": self.db.run(query)
         })
+
+
+class ImportRowboatInfractionsView(APIView, DBMixin):
+    path = "/bot/infractions/import"
+    name = "bot.infractions.import"
+
+    @api_key
+    @api_params(schema=IMPORT_INFRACTIONS_SCHEMA, validation_type=ValidationTypes.json)
+    def post(self, data):
+        return jsonify(data)
 
 
 def _infraction_list_filtered(view, params=None, query_filter=None):
