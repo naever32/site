@@ -1,10 +1,10 @@
 # TODO:  Confirm that the formatting is similar to Discords.
-import logging
+# import logging
 from uuid import uuid4, uuid5
 
-from flask import session
+# from flask import session
 from flask_dance.consumer.backend import BaseBackend
-from flask_dance.contrib.gitlab import gitlab
+# from flask_dance.contrib.gitlab import gitlab
 
 from pysite.constants import OAUTH_GITLAB_DATABASE
 
