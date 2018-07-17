@@ -269,7 +269,8 @@ TABLES = {
             "type"  # str
             "inserted_at",  # datetime
             "expires_at",  # datetime
-            "active"  # bool
+            "active",  # bool
+            "legacy_rowboat_id"  # str
         ])
     )
 }

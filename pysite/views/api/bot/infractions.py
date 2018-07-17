@@ -104,6 +104,8 @@ class InfractionType(NamedTuple):
     timed_infraction: bool  # whether the infraction is active until it expires.
 
 
+RFC1123_FORMAT = "%a, %d %b %Y %H:%M:%S GMT"
+
 INFRACTION_TYPES = {
     "warning": InfractionType(timed_infraction=False),
     "mute": InfractionType(timed_infraction=True),
@@ -139,7 +141,7 @@ UPDATE_INFRACTION_SCHEMA = Schema({
 
 IMPORT_INFRACTIONS_SCHEMA = Schema([
     {
-        "active": bool,
+        "id": str,
         "actor": {
             "id": str
         },
@@ -338,23 +340,23 @@ class ListInfractionsByTypeAndUserView(APIView, DBMixin):
 
 
 class CurrentInfractionByTypeAndUserView(APIView, DBMixin):
-    path = "/bot/infractions/user/<string:user_id>/<string:type>/current"
+    path = "/bot/infractions/user/<string:user_id>/<string:infraction_type>/current"
     name = "bot.infractions.user.type.current"
     table_name = "bot_infractions"
 
     @api_key
     @api_params(schema=GET_ACTIVE_SCHEMA, validation_type=ValidationTypes.params)
-    def get(self, params, user_id, type):
+    def get(self, params, user_id, infraction_type):
         params = params or {}
         expand = parse_bool(params.get("expand"), default=False)
 
         query_filter = {
             "user_id": user_id,
-            "type": type
+            "type": infraction_type
         }
         query = _merged_query(self, expand, query_filter).filter({
             "active": True
-        }).limit(1).nth(0).default(None)
+        }).order_by(rethinkdb.desc("data")).limit(1).nth(0).default(None)
         return jsonify({
             "infraction": self.db.run(query)
         })
@@ -363,11 +365,89 @@ class CurrentInfractionByTypeAndUserView(APIView, DBMixin):
 class ImportRowboatInfractionsView(APIView, DBMixin):
     path = "/bot/infractions/import"
     name = "bot.infractions.import"
+    table_name = "bot_infractions"
 
     @api_key
     @api_params(schema=IMPORT_INFRACTIONS_SCHEMA, validation_type=ValidationTypes.json)
     def post(self, data):
-        return jsonify(data)
+        # keep track of the un-bans, to apply after the import is complete.
+        unbans = []
+        infractions = []
+
+        # previously imported infractions
+        imported_infractions = self.db.run(
+            self.db.query(self.table_name).filter(
+                lambda row: row.has_fields("legacy_rowboat_id")
+            ).fold([], lambda acc, row: acc.append(row["legacy_rowboat_id"])).coerce_to("array")
+        )
+
+        for rowboat_infraction_data in data:
+            legacy_rowboat_id = rowboat_infraction_data["id"]
+            if legacy_rowboat_id in imported_infractions:
+                continue
+            infraction_type = rowboat_infraction_data["type"]["name"]
+            if infraction_type == "unban":
+                unbans.append(rowboat_infraction_data)
+                continue
+            # adjust infraction types
+            if infraction_type == "tempmute":
+                infraction_type = "mute"
+            if infraction_type == "tempban":
+                infraction_type = "ban"
+            if infraction_type not in INFRACTION_TYPES:
+                # unknown infraction type
+                continue
+            reason = rowboat_infraction_data["reason"] or "<No reason>"
+            user_id = rowboat_infraction_data["user"]["id"]
+            actor_id = rowboat_infraction_data["actor"]["id"]
+            inserted_at_str = rowboat_infraction_data["created_at"]
+            try:
+                inserted_at = parse_rfc1123(inserted_at_str)
+            except ValueError:
+                continue
+            expires_at_str = rowboat_infraction_data["expires_at"]
+            if expires_at_str is not None:
+                try:
+                    expires_at = parse_rfc1123(expires_at_str)
+                except ValueError:
+                    continue
+            else:
+                expires_at = None
+            infractions.append({
+                "legacy_rowboat_id": legacy_rowboat_id,
+                "reason": reason,
+                "user_id": user_id,
+                "actor_id": actor_id,
+                "inserted_at": inserted_at,
+                "expires_at": expires_at,
+                "type": infraction_type
+            })
+
+        insertion_query = self.db.query(self.table_name).insert(infractions)
+        inserted_count = self.db.run(insertion_query)["inserted"]
+
+        # apply unbans
+        for unban_data in unbans:
+            inserted_at_str = unban_data["created_at"]
+            user_id = unban_data["user"]["id"]
+            try:
+                inserted_at = parse_rfc1123(inserted_at_str)
+            except ValueError:
+                continue
+            self.db.run(
+                self.db.query(self.table_name).filter(
+                    lambda row: (row["user_id"].eq(user_id)) &
+                                (row["type"].eq("ban")) &
+                                (row["inserted_at"] < inserted_at)
+                ).pluck("id").merge(lambda row: {
+                    "active": False
+                }).coerce_to("array").for_each(lambda doc: self.db.query(self.table_name).get(doc["id"]).update(doc))
+            )
+
+        return jsonify({
+            "success": True,
+            "inserted_count": inserted_count
+        })
 
 
 def _infraction_list_filtered(view, params=None, query_filter=None):
@@ -445,6 +525,10 @@ def _is_timed_infraction(type_var):
     for infra_type in timed_infractions:
         expr = expr | type_var.eq(infra_type)
     return expr
+
+
+def parse_rfc1123(time_str):
+    return datetime.datetime.strptime(time_str, RFC1123_FORMAT).replace(tzinfo=datetime.timezone.utc)
 
 
 def parse_bool(a_string, default=None):
