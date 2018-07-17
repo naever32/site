@@ -31,7 +31,7 @@ class OAuthBackendGitlab(BaseBackend):
         self.key = manager.app.secret_key
         self.db.create_table(OAUTH_GITLAB_DATABASE, primary_key="id")
 
-    def get(selfself, *args, **kwargs):  # Not used
+    def get(self, *args, **kwargs):  # Not used
         pass
 
     def set(self, blueprint, token):
