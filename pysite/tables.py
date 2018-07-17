@@ -138,6 +138,17 @@ TABLES = {
         ])
     ),
 
+    "oauth_gitlab_data": Table(  # Gitlab's OAuth login info
+        primary_key="id",
+        keys=sorted([
+            "id",
+            "access_token",
+            "expires_at",
+            "refresh_token",
+            "snowflake"
+        ])
+    ),
+
     "off_topic_names": Table(  # Names for the off-topic category channels
         primary_key="name",
         keys=("name",),
