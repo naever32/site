@@ -50,7 +50,7 @@ class OAuthBackendGitlab(BaseBackend):
                 "id": session_id,
                 "access_token": token_data["access_token"],
                 "refresh_token": token_data["refresh_token"],
-                "expires_in": token_data["expires_in"],
+                "expires_at": token_data["expires_at"],
                 "snowflake": user_data["id"]
             },
             conflict="replace"
