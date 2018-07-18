@@ -111,7 +111,7 @@ INFRACTION_TYPES = {
     "mute": InfractionType(timed_infraction=True),
     "ban": InfractionType(timed_infraction=True),
     "kick": InfractionType(timed_infraction=False),
-    "softban": InfractionType(timed_infraction=False)
+    "superstar": InfractionType(timed_infraction=True)  # hiphopify
 }
 
 GET_SCHEMA = Schema({
