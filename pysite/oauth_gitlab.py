@@ -1,8 +1,7 @@
-# TODO:  Confirm that the formatting is similar to Discords.
 # import logging
 from uuid import uuid4, uuid5
 
-# from flask import session
+from flask import session
 from flask_dance.consumer.backend import BaseBackend
 # from flask_dance.contrib.gitlab import gitlab
 
@@ -39,5 +38,28 @@ class OAuthBackendGitlab(BaseBackend):
         sess_id = str(uuid5(uuid4(), self.key))
         self.add_user(token, user, sess_id)
 
-    def delete(self, blueprint):
+    def delete(self, blueprint):  # Not used
         pass
+
+    def add_user(self, token_data: dict, user_data: dict, session_id: str):
+        session["session_id"] = session_id
+
+        self.db.insert(
+            OAUTH_GITLAB_DATABASE,
+            {
+                "id": session_id,
+                "access_token": token_data["access_token"],
+                "refresh_token": token_data["refresh_token"],
+                "expires_in": token_data["expires_in"],
+                "snowflake": user_data["id"]
+            },
+            conflict="replace"
+        )
+
+        self.db.insert(
+            "users",
+            {
+                "user_id": user_data["id"],
+
+            }
+        )

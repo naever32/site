@@ -132,7 +132,7 @@ TABLES = {
         keys=sorted([
             "id",
             "access_token",
-            "expires_at",
+            "expires_in",
             "refresh_token",
             "snowflake"
         ])
@@ -143,7 +143,7 @@ TABLES = {
         keys=sorted([
             "id",
             "access_token",
-            "expires_at",
+            "expires_in",
             "refresh_token",
             "snowflake"
         ])

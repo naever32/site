@@ -50,7 +50,7 @@ class OAuthBackend(BaseBackend):
                 "id": session_id,
                 "access_token": token_data["access_token"],
                 "refresh_token": token_data["refresh_token"],
-                "expires_at": token_data["expires_at"],
+                "expires_in": token_data["expires_in"],
                 "snowflake": user_data["id"]
             },
             conflict="replace"
