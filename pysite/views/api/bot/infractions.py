@@ -142,6 +142,7 @@ UPDATE_INFRACTION_SCHEMA = Schema({
 IMPORT_INFRACTIONS_SCHEMA = Schema([
     {
         "id": str,
+        "active": bool,
         "actor": {
             "id": str
         },
@@ -397,6 +398,7 @@ class ImportRowboatInfractionsView(APIView, DBMixin):
             if infraction_type not in INFRACTION_TYPES:
                 # unknown infraction type
                 continue
+            active = rowboat_infraction_data["active"]
             reason = rowboat_infraction_data["reason"] or "<No reason>"
             user_id = rowboat_infraction_data["user"]["id"]
             actor_id = rowboat_infraction_data["actor"]["id"]
@@ -415,6 +417,7 @@ class ImportRowboatInfractionsView(APIView, DBMixin):
                 expires_at = None
             infractions.append({
                 "legacy_rowboat_id": legacy_rowboat_id,
+                "active": active,
                 "reason": reason,
                 "user_id": user_id,
                 "actor_id": actor_id,
