@@ -125,7 +125,7 @@ GET_ACTIVE_SCHEMA = Schema({
 
 CREATE_INFRACTION_SCHEMA = Schema({
     "type": lambda tp: tp in INFRACTION_TYPES,
-    "reason": str,
+    "reason": Or(str, None),
     "user_id": str,  # Discord user ID
     "actor_id": str,  # Discord user ID
     Optional("duration"): str,  # If not provided, may imply permanence depending on the infraction
@@ -134,7 +134,7 @@ CREATE_INFRACTION_SCHEMA = Schema({
 
 UPDATE_INFRACTION_SCHEMA = Schema({
     "id": str,
-    Optional("reason"): str,
+    Optional("reason"): Or(str, None),
     Optional("duration"): Or(str, None),
     Optional("active"): bool
 })
