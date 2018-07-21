@@ -4,6 +4,7 @@ INFRACTIONS API
 "GET" endpoints in this API may take the following optional parameters, depending on the endpoint:
   - active: filters infractions that are active (true), expired (false), or either (not present/any)
   - expand: expands the result data with the information about the users (slower)
+  - dangling: filters infractions that are active, or inactive infractions that have not been closed manually.
 
 Infraction Schema:
   This schema is used when an infraction's data is returned.
@@ -32,7 +33,7 @@ Endpoints:
 
   GET /bot/infractions
     Gets a list of all infractions, regardless of type or user.
-    Parameters: "active", "expand".
+    Parameters: "active", "expand", "dangling".
     This endpoint returns an array of infraction objects.
 
   GET /bot/infractions/user/<user_id>
@@ -82,7 +83,8 @@ Endpoints:
       "duration" (optional str): if provided, updates the expiration of the infraction to the time of UPDATING
         plus the duration. If set to null, the expiration is also set to null (may imply permanence).
       "active" (optional bool): if provided, activates or deactivates the infraction. This does not do anything
-        if the infraction isn't duration-based, or if the infraction has already expired.
+        if the infraction isn't duration-based, or if the infraction has already expired. This marks the infraction
+        as closed.
       "expand" (optional bool): whether to expand the infraction user data once the infraction is updated and returned.
 """
 
@@ -105,6 +107,7 @@ class InfractionType(NamedTuple):
 
 
 RFC1123_FORMAT = "%a, %d %b %Y %H:%M:%S GMT"
+EXCLUDED_FIELDS = "user_id", "actor_id", "closed", "_timed"
 
 INFRACTION_TYPES = {
     "warning": InfractionType(timed_infraction=False),
@@ -116,7 +119,8 @@ INFRACTION_TYPES = {
 
 GET_SCHEMA = Schema({
     Optional("active"): str,
-    Optional("expand"): str
+    Optional("expand"): str,
+    Optional("dangling"): str
 })
 
 GET_ACTIVE_SCHEMA = Schema({
@@ -166,8 +170,11 @@ class InfractionsView(APIView, DBMixin):
 
     @api_key
     @api_params(schema=GET_SCHEMA, validation_type=ValidationTypes.params)
-    def get(self, params=None):
-        return _infraction_list_filtered(self, params, {})
+    def get(self, params: dict = None):
+        if "dangling" in params:
+            return _infraction_list_filtered(self, params, {"_timed": True, "closed": False})
+        else:
+            return _infraction_list_filtered(self, params, {})
 
     @api_key
     @api_params(schema=CREATE_INFRACTION_SCHEMA, validation_type=ValidationTypes.json)
@@ -199,7 +206,7 @@ class InfractionsView(APIView, DBMixin):
                 deactivate_infraction_query = \
                     self.db.query(self.table_name) \
                         .get(active_infraction["id"]) \
-                        .update({"active": False})
+                        .update({"active": False, "closed": True})
 
             if duration_str:
                 try:
@@ -227,7 +234,7 @@ class InfractionsView(APIView, DBMixin):
         query = self.db.query(self.table_name).get(infraction_id) \
             .merge(_merge_expand_users(self, expand)) \
             .merge(_merge_active_check()) \
-            .without("user_id", "actor_id").default(None)
+            .without(*EXCLUDED_FIELDS).default(None)
         return jsonify({
             "infraction": self.db.run(query)
         })
@@ -245,6 +252,7 @@ class InfractionsView(APIView, DBMixin):
 
         if "active" in data:
             update_collection["active"] = data["active"]
+            update_collection["closed"] = not data["active"]
 
         if "duration" in data:
             duration_str = data["duration"]
@@ -271,7 +279,7 @@ class InfractionsView(APIView, DBMixin):
         query = self.db.query(self.table_name).get(data["id"]) \
             .merge(_merge_expand_users(self, expand)) \
             .merge(_merge_active_check()) \
-            .without("user_id", "actor_id").default(None)
+            .without(*EXCLUDED_FIELDS).default(None)
         infraction = self.db.run(query)
 
         return jsonify({
@@ -294,7 +302,7 @@ class InfractionById(APIView, DBMixin):
         query = self.db.query(self.table_name).get(infraction_id) \
             .merge(_merge_expand_users(self, expand)) \
             .merge(_merge_active_check()) \
-            .without("user_id", "actor_id").default(None)
+            .without(*EXCLUDED_FIELDS).default(None)
         return jsonify({
             "infraction": self.db.run(query)
         })
@@ -468,11 +476,11 @@ def _infraction_list_filtered(view, params=None, query_filter=None):
 
 def _merged_query(view, expand, query_filter):
     return view.db.query(view.table_name).merge(_merge_active_check()).filter(query_filter) \
-        .merge(_merge_expand_users(view, expand)).without("user_id", "actor_id")
+        .merge(_merge_expand_users(view, expand)).without(*EXCLUDED_FIELDS)
 
 
 def _merge_active_check():
-    # Checks if the "active" field has been set to false (manual infraction removal).
+    # Checks if the "closed" field has been set to true (manual infraction removal).
     # If not, the "active" field is set to whether the infraction has expired.
     def _merge(row):
         return {
@@ -480,7 +488,7 @@ def _merge_active_check():
                 rethinkdb.branch(
                     _is_timed_infraction(row["type"]),
                     rethinkdb.branch(
-                        row["active"].default(True).eq(False),
+                        (row["closed"].default(False).eq(True)) | (row["active"].default(True).eq(False)),
                         False,
                         rethinkdb.branch(
                             row["expires_at"].eq(None),
@@ -489,7 +497,9 @@ def _merge_active_check():
                         )
                     ),
                     False
-                )
+                ),
+            "closed": row["closed"].default(False),
+            "_timed": _is_timed_infraction(row["type"])
         }
 
     return _merge
