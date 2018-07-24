@@ -275,7 +275,8 @@ class InfractionsView(APIView, DBMixin):
 
         if not result_update["replaced"]:
             return jsonify({
-                "success": False
+                "success": False,
+                "error_message": "Unknown infraction / nothing was changed."
             })
 
         # return the updated infraction
