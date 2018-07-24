@@ -108,6 +108,7 @@ class InfractionType(NamedTuple):
 
 RFC1123_FORMAT = "%a, %d %b %Y %H:%M:%S GMT"
 EXCLUDED_FIELDS = "user_id", "actor_id", "closed", "_timed"
+INFRACTION_ORDER = rethinkdb.desc("active"), rethinkdb.desc("inserted_at")
 
 INFRACTION_TYPES = {
     "warning": InfractionType(timed_infraction=False),
@@ -470,7 +471,7 @@ def _infraction_list_filtered(view, params=None, query_filter=None):
     if active is not None:
         query_filter["active"] = active
 
-    query = _merged_query(view, expand, query_filter)
+    query = _merged_query(view, expand, query_filter).order_by(*INFRACTION_ORDER)
     return jsonify(view.db.run(query.coerce_to("array")))
 
 
