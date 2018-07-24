@@ -5,6 +5,7 @@ INFRACTIONS API
   - active: filters infractions that are active (true), expired (false), or either (not present/any)
   - expand: expands the result data with the information about the users (slower)
   - dangling: filters infractions that are active, or inactive infractions that have not been closed manually.
+  - search: filters the "reason" field to match the given RE2 query.
 
 Infraction Schema:
   This schema is used when an infraction's data is returned.
@@ -33,22 +34,22 @@ Endpoints:
 
   GET /bot/infractions
     Gets a list of all infractions, regardless of type or user.
-    Parameters: "active", "expand", "dangling".
+    Parameters: "active", "expand", "dangling", "search".
     This endpoint returns an array of infraction objects.
 
   GET /bot/infractions/user/<user_id>
     Gets a list of all infractions for a user.
-    Parameters: "active", "expand".
+    Parameters: "active", "expand", "search".
     This endpoint returns an array of infraction objects.
 
   GET /bot/infractions/type/<type>
     Gets a list of all infractions of the given type (ban, mute, etc.)
-    Parameters: "active", "expand".
+    Parameters: "active", "expand", "search".
     This endpoint returns an array of infraction objects.
 
   GET /bot/infractions/user/<user_id>/<type>
     Gets a list of all infractions of the given type for a user.
-    Parameters: "active", "expand".
+    Parameters: "active", "expand", "search".
     This endpoint returns an array of infraction objects.
 
   GET /bot/infractions/user/<user_id>/<type>/current
@@ -121,7 +122,8 @@ INFRACTION_TYPES = {
 GET_SCHEMA = Schema({
     Optional("active"): str,
     Optional("expand"): str,
-    Optional("dangling"): str
+    Optional("dangling"): str,
+    Optional("search"): str
 })
 
 GET_ACTIVE_SCHEMA = Schema({
@@ -467,11 +469,24 @@ def _infraction_list_filtered(view, params=None, query_filter=None):
     query_filter = query_filter or {}
     active = parse_bool(params.get("active"))
     expand = parse_bool(params.get("expand"), default=False)
+    search = params.get("search")
 
     if active is not None:
         query_filter["active"] = active
 
-    query = _merged_query(view, expand, query_filter).order_by(*INFRACTION_ORDER)
+    query = _merged_query(view, expand, query_filter)
+
+    if search is not None:
+        query = query.filter(
+            lambda row: rethinkdb.branch(
+                row["reason"].eq(None),
+                False,
+                row["reason"].match(search)
+            )
+        )
+
+    query = query.order_by(*INFRACTION_ORDER)
+
     return jsonify(view.db.run(query.coerce_to("array")))
 
 
