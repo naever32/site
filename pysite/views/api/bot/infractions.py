@@ -175,10 +175,7 @@ class InfractionsView(APIView, DBMixin):
     @api_params(schema=GET_SCHEMA, validation_type=ValidationTypes.params)
     def get(self, params: dict = None):
         if "dangling" in params:
-            return _infraction_list_filtered(self, params,
-                                             (rethinkdb.row["_timed"].eq(True)) &
-                                             (rethinkdb.row["closed"].eq(False)) &
-                                             (rethinkdb.row.has_fields("legacy_rowboat_id").eq(False)))
+            return _infraction_list_filtered(self, params, {"_timed": True, "closed": False})
         else:
             return _infraction_list_filtered(self, params, {})
 
@@ -432,7 +429,7 @@ class ImportRowboatInfractionsView(APIView, DBMixin):
                 expires_at = None
             infractions.append({
                 "legacy_rowboat_id": legacy_rowboat_id,
-                "active": active,
+                "closed": not active,
                 "reason": reason,
                 "user_id": user_id,
                 "actor_id": actor_id,
