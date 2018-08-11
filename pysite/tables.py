@@ -288,5 +288,16 @@ TABLES = {
             "user_id",
             "channel_id"
         ])
+    ),
+
+    "reminders": Table(
+        primary_key="id",
+        keys=sorted([
+            "id",  # str
+            "user_id",  # str
+            "channel_id",  # str
+            "expires_at",  # datetime
+            "content"  # str
+        ])
     )
 }
