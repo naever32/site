@@ -16,6 +16,14 @@ TABLES = {
         ])
     ),
 
+    "bot_logs": Table(  # Logs uploaded via the logs API endpoint
+        primary_key="id",
+        keys=sorted([
+            "id",
+            "log_data"
+        ])
+    ),
+
     "hiphopify": Table(  # Users in hiphop prison
         primary_key="user_id",
         keys=sorted([
@@ -52,7 +60,7 @@ TABLES = {
             "teams",  # list[str]
             "theme",  # str
             "title",  # str
-            "winners"  # list[str]
+            "winning_team"  # str
         ])
     ),
 
@@ -249,6 +257,37 @@ TABLES = {
             "package"
         ]),
         locked=False
+    ),
+
+    "bot_settings": Table(
+        primary_key="key",
+        keys=sorted([
+            "key",  # str
+            "value"  # any
+        ])
+    ),
+
+    "bot_infractions": Table(
+        primary_key="id",
+        keys=sorted([
+            "id",  # str
+            "user_id",  # str
+            "actor_id",  # str
+            "reason",  # str
+            "type",  # str
+            "inserted_at",  # datetime
+            "expires_at",  # datetime
+            "closed",  # bool
+            "legacy_rowboat_id"  # str
+        ])
+    ),
+
+    "watched_users": Table(  # Users being monitored by the bot's BigBrother cog
+        primary_key="user_id",
+        keys=sorted([
+            "user_id",
+            "channel_id"
+        ])
     ),
 
     "challenges": Table(  # Challenges
