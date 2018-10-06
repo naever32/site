@@ -68,7 +68,7 @@ class RemindersView(APIView, DBMixin):
     @api_params(schema=POST_SCHEMA, validation_type=ValidationTypes.json)
     def post(self, json_data):
         """
-        Receive information about a requested reminder.
+        Create and save a new reminder.
 
         Data must be provided as JSON.
         API key must be provided as header.
@@ -147,7 +147,7 @@ class RemindersByUserView(APIView, DBMixin):
 
     def _get_full_reminder(self, user_id: str, friendly_id: str):
         """
-        Get the a user's reminder content.
+        Get a user's reminder content.
 
         :param user_id: The reminder's user.
         :param friendly_id: The user's ID for the reminder.
