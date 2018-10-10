@@ -123,7 +123,8 @@ GET_SCHEMA = Schema({
     Optional("active"): str,
     Optional("expand"): str,
     Optional("dangling"): str,
-    Optional("search"): str
+    Optional("search"): str,
+    Optional("hidden"): str
 })
 
 GET_ACTIVE_SCHEMA = Schema({
@@ -136,6 +137,7 @@ CREATE_INFRACTION_SCHEMA = Schema({
     "user_id": str,  # Discord user ID
     "actor_id": str,  # Discord user ID
     Optional("duration"): str,  # If not provided, may imply permanence depending on the infraction
+    Optional("hidden"): bool,
     Optional("expand"): bool
 })
 
@@ -190,6 +192,7 @@ class InfractionsView(APIView, DBMixin):
         reason = data["reason"]
         duration_str = data.get("duration")
         expand = data.get("expand")
+        hidden = data.get("hidden")
         expires_at = None
         inserted_at = datetime.datetime.now(tz=datetime.timezone.utc)
 
@@ -226,7 +229,8 @@ class InfractionsView(APIView, DBMixin):
             "type": infraction_type,
             "reason": reason,
             "inserted_at": inserted_at,
-            "expires_at": expires_at
+            "expires_at": expires_at,
+            "hidden": hidden
         }
 
         infraction_id = self.db.insert(self.table_name, infraction_insert_doc)["generated_keys"][0]
@@ -469,6 +473,7 @@ def _infraction_list_filtered(view, params=None, query_filter=None):
     params = params or {}
     query_filter = query_filter or {}
     active = parse_bool(params.get("active"))
+    hidden = parse_bool(params.get("hidden"), default=False)
     expand = parse_bool(params.get("expand"), default=False)
     search = params.get("search")
 
@@ -476,6 +481,18 @@ def _infraction_list_filtered(view, params=None, query_filter=None):
         query_filter["active"] = active
 
     query = _merged_query(view, expand, query_filter)
+
+    query = query.filter(
+        # let all infractions though the filter if we want to
+        # view hidden infractions as well as non-hidden ones.
+        # otherwise, only accept non-hidden infractions
+        # or those with no hidden property (for older infractions)
+        lambda infr: rethinkdb.branch(
+            hidden,
+            True,
+            (~infr["hidden"]).default(True)
+        )
+    )
 
     if search is not None:
         query = query.filter(
