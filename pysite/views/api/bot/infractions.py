@@ -6,6 +6,7 @@ INFRACTIONS API
   - expand: expands the result data with the information about the users (slower)
   - dangling: filters infractions that are active, or inactive infractions that have not been closed manually.
   - search: filters the "reason" field to match the given RE2 query.
+  - hidden: determines whether shadow infractions are filtered out or kept in the response.
 
 Infraction Schema:
   This schema is used when an infraction's data is returned.
@@ -28,6 +29,7 @@ Infraction Schema:
       This object uses the same schema as the "user" field.
     "type" (str): the type of the infraction.
     "reason" (str): the reason for the infraction.
+    "hidden" (bool): whether it's a shadow infraction or not.
 
 
 Endpoints:
@@ -39,17 +41,17 @@ Endpoints:
 
   GET /bot/infractions/user/<user_id>
     Gets a list of all infractions for a user.
-    Parameters: "active", "expand", "search".
+    Parameters: "active", "expand", "search", "hidden".
     This endpoint returns an array of infraction objects.
 
   GET /bot/infractions/type/<type>
     Gets a list of all infractions of the given type (ban, mute, etc.)
-    Parameters: "active", "expand", "search".
+    Parameters: "active", "expand", "search", "hidden".
     This endpoint returns an array of infraction objects.
 
   GET /bot/infractions/user/<user_id>/<type>
     Gets a list of all infractions of the given type for a user.
-    Parameters: "active", "expand", "search".
+    Parameters: "active", "expand", "search", "hidden".
     This endpoint returns an array of infraction objects.
 
   GET /bot/infractions/user/<user_id>/<type>/current
