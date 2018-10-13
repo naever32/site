@@ -485,7 +485,7 @@ def _infraction_list_filtered(view, params=None, query_filter=None):
     query = _merged_query(view, expand, query_filter)
 
     query = query.filter(
-        # let all infractions though the filter if we want to
+        # let all infractions through the filter if we want to
         # view hidden infractions as well as non-hidden ones.
         # otherwise, only accept non-hidden infractions
         # or those with no hidden property (for older infractions)
