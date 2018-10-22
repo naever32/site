@@ -52,6 +52,7 @@ class JamsTeamEditRepo(APIView, DBMixin, OAuthMixin):
         url = parse_url(repo_url)
 
         if url.host != "gitlab.com" or url.path is None:
+            log.warning(f"Invalid user input for GitLab repository ({repo_url}): invalid host or no path")
             return self.error(
                 ErrorCodes.incorrect_parameters,
                 "Not a GitLab repository."
@@ -59,6 +60,7 @@ class JamsTeamEditRepo(APIView, DBMixin, OAuthMixin):
 
         project_path = url.path.strip("/")  # /user/repository/ --> user/repository
         if len(project_path.split("/")) < 2:
+            log.warning(f"Invalid user input for GitLab repository ({repo_url}): path is too short")
             return self.error(
                 ErrorCodes.incorrect_parameters,
                 "Not a valid repository."
@@ -67,6 +69,7 @@ class JamsTeamEditRepo(APIView, DBMixin, OAuthMixin):
         word_regex = re.compile("^[\-\.\w]+$")  # Alphanumerical, underscores, periods, and dashes
         for segment in project_path.split("/"):
             if not word_regex.fullmatch(segment):
+                log.warning(f"Invalid user input for GitLab repository ({repo_url}): path does not match pattern")
                 return self.error(
                     ErrorCodes.incorrect_parameters,
                     "Not a valid repository."
@@ -98,6 +101,8 @@ class JamsTeamEditRepo(APIView, DBMixin, OAuthMixin):
         query_response = self.request_project(project_path)
 
         if query_response.status_code != 200:
+            log.warning(f"Failed to lookup GitLab project ({project_path}): code={query_response.status_code}, "
+                        f"body=\"{query_response.text}\"")
             return self.error(
                 ErrorCodes.incorrect_parameters,
                 "Not a valid repository."
