@@ -107,6 +107,9 @@ rethinkdb_data/
 # Vagrant
 .vagrant/
 
+# VSCode
+.vscode/
+
 # SASS cache
 .sass-cache/
 
