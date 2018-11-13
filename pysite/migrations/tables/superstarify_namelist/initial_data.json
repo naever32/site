@@ -1,9 +1,5 @@
 [
     {
-        "name": "The Beatles",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/d/df/The_Fabs.JPG"
-    },
-    {
         "name": "Elvis Presley",
         "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Elvis_Presley_promoting_Jailhouse_Rock.jpg/1200px-Elvis_Presley_promoting_Jailhouse_Rock.jpg"
     },
@@ -20,14 +16,6 @@
         "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Elton_John_2011_Shankbone_2.JPG/1200px-Elton_John_2011_Shankbone_2.JPG"
     },
     {
-        "name": "Led Zeppelin",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/4/49/LedZeppelinmontage.jpg"
-    },
-    {
-        "name": "Pink Floyd",
-        "image_url": "https://upload.wikimedia.org/wikipedia/en/d/d6/Pink_Floyd_-_all_members.jpg"
-    },
-    {
         "name": "Rihanna",
         "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Rihanna_5%2C_2012.jpg/1200px-Rihanna_5%2C_2012.jpg"
     },
@@ -40,10 +28,6 @@
         "image_url": "https://upload.wikimedia.org/wikipedia/commons/2/21/MariahGMA.jpg"
     },
     {
-        "name": "Queen",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/3/33/Queen_%E2%80%93_montagem_%E2%80%93_new.png"
-    },
-    {
         "name": "Celine Dion",
         "image_url": "https://upload.wikimedia.org/wikipedia/commons/e/ee/Celine_Dion_Live_2017.jpg"
     },
@@ -52,32 +36,12 @@
         "image_url": "https://upload.wikimedia.org/wikipedia/commons/a/a7/Whitney_Houston_Welcome_Home_Heroes_1_cropped.jpg"
     },
     {
-        "name": "AC/DC",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/9/9e/ACDC_In_Tacoma_2009.jpg"
-    },
-    {
-        "name": "The Rolling Stones",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/f/fc/Trs_20150623_milwaukee_jp_105.jpg"
-    },
-    {
-        "name": "ABBA",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/c/cb/ABBA_-_TopPop_1974_5.png"
-    },
-    {
         "name": "Taylor Swift",
         "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Taylor_Swift_112_%2818119055110%29_%28cropped%29.jpg/1200px-Taylor_Swift_112_%2818119055110%29_%28cropped%29.jpg"
     },
     {
         "name": "Garth Brooks",
         "image_url": "https://upload.wikimedia.org/wikipedia/commons/b/bc/Garth_Brooks_on_World_Tour_%28crop%29.png"
-    },
-    {
-        "name": "Eagles",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/0/00/Eagles.jpg"
-    },
-    {
-        "name": "U2",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/U2_on_Joshua_Tree_Tour_2017_Brussels_8-1-17.jpg/1200px-U2_on_Joshua_Tree_Tour_2017_Brussels_8-1-17.jpg"
     },
     {
         "name": "Billy Joel",
@@ -120,14 +84,6 @@
         "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Bruce_Springsteen_-_Roskilde_Festival_2012.jpg/1200px-Bruce_Springsteen_-_Roskilde_Festival_2012.jpg"
     },
     {
-        "name": "Metallica",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/Metallica_Live_at_The_O2%2C_London%2C_England%2C_22_October_2017.jpg/1200px-Metallica_Live_at_The_O2%2C_London%2C_England%2C_22_October_2017.jpg"
-    },
-    {
-        "name": "Bee Gees",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/9/9b/Bee_Gees_1977.JPG"
-    },
-    {
         "name": "Lady Gaga",
         "image_url": "https://upload.wikimedia.org/wikipedia/commons/4/4f/TIFF_2018_Lady_Gaga_%281_of_1%29-3_%28cropped%29_%28edited%29.jpg"
     },
@@ -152,10 +108,6 @@
         "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/B%27Z_Best_Buy_Theater_montage.jpg/1200px-B%27Z_Best_Buy_Theater_montage.jpg"
     },
     {
-        "name": "Coldplay",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Coldplay_-_Global-Citizen-Festival_Hamburg_14.jpg/1200px-Coldplay_-_Global-Citizen-Festival_Hamburg_14.jpg"
-    },
-    {
         "name": "Bon Jovi",
         "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Bon_Jovi_1.jpg/1200px-Bon_Jovi_1.jpg"
     },
@@ -164,28 +116,12 @@
         "image_url": "https://upload.wikimedia.org/wikipedia/commons/f/f2/Beyonce_-_The_Formation_World_Tour%2C_at_Wembley_Stadium_in_London%2C_England.jpg"
     },
     {
-        "name": "Linkin Park",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/LinkinParkBerlin2010.jpg/1200px-LinkinParkBerlin2010.jpg"
-    },
-    {
-        "name": "Fleetwood Mac",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/FleetMacTulsa031018-81_%2830294522547%29.jpg/1200px-FleetMacTulsa031018-81_%2830294522547%29.jpg"
-    },
-    {
         "name": "Britney Spears",
         "image_url": "https://upload.wikimedia.org/wikipedia/commons/d/da/Britney_Spears_2013_%28Straighten_Crop%29.jpg"
     },
     {
         "name": "Rod Stewart",
         "image_url": "https://upload.wikimedia.org/wikipedia/commons/5/57/Rod_stewart_05111976_12_400.jpg"
-    },
-    {
-        "name": "Guns N' Roses",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/GNR_London_Stadium_2017_3_%28cropped%29.jpg/1200px-GNR_London_Stadium_2017_3_%28cropped%29.jpg"
-    },
-    {
-        "name": "Backstreet Boys",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/BSB_Old_Navy_Performance.jpg/1200px-BSB_Old_Navy_Performance.jpg"
     },
     {
         "name": "George Strait",
@@ -212,10 +148,6 @@
         "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Paul_McCartney_-_Out_There_Concert_-_140420-5941-jikatu_%2813950091384%29.jpg/1200px-Paul_McCartney_-_Out_There_Concert_-_140420-5941-jikatu_%2813950091384%29.jpg"
     },
     {
-        "name": "Simon & Garfunkel",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/e/e5/SimonandGarfunkel.jpg"
-    },
-    {
         "name": "Janet Jackson",
         "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/JanetJacksonUnbreakableTourSanFran2015_%28cropped%29.jpg/1200px-JanetJacksonUnbreakableTourSanFran2015_%28cropped%29.jpg"
     },
@@ -224,28 +156,12 @@
         "image_url": "https://upload.wikimedia.org/wikipedia/commons/e/ef/Julio_Iglesias09.jpg"
     },
     {
-        "name": "Chicago",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/6/6b/Chicagothebandmillbrook_lar.jpg"
-    },
-    {
-        "name": "Dire Straits",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/a/a2/Dire_straits_22101985_23_800.jpg"
-    },
-    {
         "name": "Bob Dylan",
         "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Bob_Dylan_-_Azkena_Rock_Festival_2010_2.jpg/1200px-Bob_Dylan_-_Azkena_Rock_Festival_2010_2.jpg"
     },
     {
-        "name": "Def Leppard",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Def_Leppard_Allstate_Arena_7-19-12.JPG/1200px-Def_Leppard_Allstate_Arena_7-19-12.JPG"
-    },
-    {
         "name": "Cher",
         "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Cher_-_Casablanca.jpg/1200px-Cher_-_Casablanca.jpg"
-    },
-    {
-        "name": "Genesis",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/2180_-_Pittsburgh_-_Mellon_Arena_-_Genesis_-_The_Carpet_Crawlers.JPG/1200px-2180_-_Pittsburgh_-_Mellon_Arena_-_Genesis_-_The_Carpet_Crawlers.JPG"
     },
     {
         "name": "Olivia Newton-John",
@@ -276,24 +192,12 @@
         "image_url": "https://upload.wikimedia.org/wikipedia/commons/d/dd/Nobel_Peace_Price_Concert_2009_Donna_Summer3.jpg"
     },
     {
-        "name": "The Beach Boys",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/The_Beach_Boys%2C_May_29%2C_2012.jpg/1200px-The_Beach_Boys%2C_May_29%2C_2012.jpg"
-    },
-    {
-        "name": "The Who",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/Who_-_1975.jpg/1200px-Who_-_1975.jpg"
-    },
-    {
         "name": "Barry White",
         "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Barry_White%2C_Bestanddeelnr_927-0099.jpg/1200px-Barry_White%2C_Bestanddeelnr_927-0099.jpg"
     },
     {
         "name": "Drake",
         "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Drake_at_the_Velvet_Underground_-_2017_%2835986086223%29_%28cropped%29.jpg/1200px-Drake_at_the_Velvet_Underground_-_2017_%2835986086223%29_%28cropped%29.jpg"
-    },
-    {
-        "name": "Maroon 5",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Maroon_5_2016.jpg/1200px-Maroon_5_2016.jpg"
     },
     {
         "name": "Shania Twain",
@@ -304,16 +208,8 @@
         "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/P%21nk_Live_2013.jpg/1200px-P%21nk_Live_2013.jpg"
     },
     {
-        "name": "The Carpenters",
-        "image_url": "https://upload.wikimedia.org/wikipedia/en/thumb/b/b3/Carpenters_1974.jpg/1200px-Carpenters_1974.jpg"
-    },
-    {
         "name": "Lionel Richie",
         "image_url": "https://upload.wikimedia.org/wikipedia/commons/c/cd/Lionel_Richie_2017.jpg"
-    },
-    {
-        "name": "Earth, Wind & Fire",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Earth%2C_Wind_%26_Fire_%282%29.jpg/1200px-Earth%2C_Wind_%26_Fire_%282%29.jpg"
     },
     {
         "name": "Johnny Cash",
@@ -328,10 +224,6 @@
         "image_url": "https://upload.wikimedia.org/wikipedia/commons/6/66/Nicki_Minaj_cropped.jpg"
     },
     {
-        "name": "R.E.M.",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/a/a4/Padova_REM_concert_July_22_2003_blue.jpg"
-    },
-    {
         "name": "Flo Rida",
         "image_url": "https://upload.wikimedia.org/wikipedia/commons/8/8b/Flo_Rida_%286924266548%29.jpg"
     },
@@ -344,20 +236,8 @@
         "image_url": "https://upload.wikimedia.org/wikipedia/commons/5/50/Ayumi_Hamasaki_2007.jpg"
     },
     {
-        "name": "Red Hot Chili Peppers",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/9/9b/Red_Hot_Chili_Peppers_2012-07-02_001.jpg"
-    },
-    {
-        "name": "Foreigner",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Foreigner2009.jpg/1200px-Foreigner2009.jpg"
-    },
-    {
         "name": "George Michael",
         "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/George_Michael.jpeg/1200px-George_Michael.jpeg"
-    },
-    {
-        "name": "The Doors",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/The_Doors_1968.JPG/1200px-The_Doors_1968.JPG"
     },
     {
         "name": "Reba McEntire",
@@ -374,14 +254,6 @@
     {
         "name": "Johnny Hallyday",
         "image_url": "https://upload.wikimedia.org/wikipedia/commons/a/a1/Johnny_Hallyday_Cannes.jpg"
-    },
-    {
-        "name": "The Black Eyed Peas",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/3/3d/Black_Eyed_Peas_at_Walmart_meeting.jpg"
-    },
-    {
-        "name": "Journey",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/b/be/Journey_publicity_photo_2013.jpg"
     },
     {
         "name": "Tim McGraw",
@@ -412,16 +284,8 @@
         "image_url": "https://pbs.twimg.com/media/CU1fFdeUYAABs6i.jpg"
     },
     {
-        "name": "Alabama",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Alabama_at_Bayfest_2014.jpg/1200px-Alabama_at_Bayfest_2014.jpg"
-    },
-    {
         "name": "Bob Seger",
         "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Bob_Seger_2013.jpg/1200px-Bob_Seger_2013.jpg"
-    },
-    {
-        "name": "Nirvana",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/1/19/Nirvana_around_1992.jpg"
     },
     {
         "name": "Bryan Adams",
@@ -432,16 +296,8 @@
         "image_url": "https://upload.wikimedia.org/wikipedia/commons/5/5e/Bob-Marley.jpg"
     },
     {
-        "name": "The Police",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/a/a2/ThePolice_2007.jpg"
-    },
-    {
         "name": "Barry Manilow",
         "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/BarryManilow.jpg/1200px-BarryManilow.jpg"
-    },
-    {
-        "name": "Kiss",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/W0854-Hellfest2013_Kiss_69933.JPG/1200px-W0854-Hellfest2013_Kiss_69933.JPG"
     },
     {
         "name": "Aretha Franklin",
