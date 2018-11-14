@@ -73,12 +73,12 @@ class TagsView(APIView, DBMixin):
             is_alias = self.db.filter(self.table_name, lambda row: row['tag_aliases'].contains(aliases_of))
             if is_primary:
                 data = (
-                        [is_primary.get('tag_name')] + is_primary.get('tag_aliases')
+                    [is_primary.get('tag_name')] + is_primary.get('tag_aliases')
                 )
             elif is_alias:
                 document = next(iter(is_alias))
                 data = (
-                        [document.get('tag_name')] + document.get('tag_aliases')
+                    [document.get('tag_name')] + document.get('tag_aliases')
                 )
             else:
                 data = []
@@ -167,5 +167,3 @@ class TagsView(APIView, DBMixin):
                 lambda db: db.row['tag_aliases'].default([]).append(data['tag_alias'])
             )
             return jsonify({"success": True})
-
-
