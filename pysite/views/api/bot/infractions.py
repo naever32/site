@@ -123,10 +123,10 @@ INFRACTION_TYPES = {
 
 GET_SCHEMA = Schema({
     Optional("active"): str,
-    Optional("expand"): str,
+    Optional("expand", default="false"): str,
     Optional("dangling"): str,
     Optional("search"): str,
-    Optional("hidden"): str
+    Optional("hidden", default="false"): str
 })
 
 GET_ACTIVE_SCHEMA = Schema({
@@ -475,8 +475,8 @@ def _infraction_list_filtered(view, params=None, query_filter=None):
     params = params or {}
     query_filter = query_filter or {}
     active = parse_bool(params.get("active"))
-    hidden = parse_bool(params.get("hidden"), default=False)
-    expand = parse_bool(params.get("expand"), default=False)
+    hidden = parse_bool(params.get("hidden"))
+    expand = parse_bool(params.get("expand"))
     search = params.get("search")
 
     if active is not None:
