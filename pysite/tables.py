@@ -24,6 +24,14 @@ TABLES = {
         ])
     ),
 
+    "clean_logs": Table(  # Logs of cleanups done by the clean bot commands
+        primary_key="id",
+        keys=sorted([
+            "id",
+            "log_data"
+        ])
+    ),
+
     "superstarify": Table(  # Users in superstar prison
         primary_key="user_id",
         keys=sorted([
@@ -203,6 +211,7 @@ TABLES = {
         keys=sorted([
             "tag_name",
             "tag_content",
+            "tag_aliases",
             "image_url"
         ]),
         locked=False

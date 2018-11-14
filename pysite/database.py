@@ -341,6 +341,61 @@ class RethinkDB:
             new_connection=True
         )
 
+    def update(self, table_name: str, key_or_predicate: Union[str, Callable[[Dict[str, Any]], bool]],
+               key: Any, _object: Any, default: Union[bool, UserError] = False):
+        """
+        Insert objects to key in table with provided parameters.
+
+        The `predicate` argument should be a function that takes a single argument - a single document to check - and
+        >>> db = RethinkDB()
+        >>> db.get('super_heroes', 'superman')
+        {'name': 'superman'}
+        >>> db.update(
+        ...     'super_heroes',
+        ...     'superman',
+        ...     'abilities',
+        ...     lambda db: db.row['tag_aliases'].default([]).append('flying')
+        ... )
+        {
+            'name': 'superman',
+            'abilities': ['flying']
+        }
+        >>> db.update(
+        ...     'super_heroes',
+        ...     lambda doc: doc['tag_aliases'].contains('flying'),
+        ...     'abilities',
+        ...     ['invincibility', 'laser_beams']
+        ... )
+        >>> db.get('super_heroes', 'superman')
+        {
+            'name': 'superman',
+            'abilities': ['invincibility', 'laser_beams']
+        }
+
+        :param table_name: The name of the table to get documents for
+        :param predicate: The callable to use to filter the documents, should only end up with one document
+        :param default: What to do if a document is missing fields; True to include them, `rethink.error()` to raise
+            aa ReqlRuntimeError, or False to skip over the document (the default)
+        :param _object: The new value we are updating to,
+            can be a callable which takes retinkdb for more complicated queries
+        :param key: The key to be updated in given document
+        """
+
+        query = self.query(table_name)
+        if callable(_object):
+            _object = _object(rethinkdb)
+        if callable(key_or_predicate):
+            update = query.filter(key_or_predicate, default=default)
+            filtered = len(self.run(update).items)
+            if filtered != 1:
+                raise ReferenceError(
+                    'Predicate function should filter down to 1 value '
+                    f'instead it returned {filtered} results.'
+                )
+        else:
+            update = [query.get(key_or_predicate)]
+        return self.run(update[0].update({key: _object}))
+
     def filter(self, table_name: str, predicate: Callable[[Dict[str, Any]], bool],
                default: Union[bool, UserError] = False) -> List[Dict[str, Any]]:
         """
