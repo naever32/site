@@ -82,7 +82,7 @@ class ApiBotTagsEndpoint(SiteTest):
         self.assertEqual(response.status_code, 200)
 
         # GET method - get from alias
-        response = self.client.get('/bot/tags?aliases_of=test_alias', app.config['API_SUBDOMAIN'],
+        response = self.client.get('/bot/tags?tag_aliases=test_alias', app.config['API_SUBDOMAIN'],
                                    headers=app.config['TEST_HEADER'])
         self.assertEqual(response.json, {
             "tag_alias": "test_alias",
