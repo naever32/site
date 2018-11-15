@@ -75,8 +75,8 @@ class ApiBotTagsEndpoint(SiteTest):
         response = self.client.get('/bot/tags?tag_name=testing', app.config['API_SUBDOMAIN'], headers=app.config['TEST_HEADER'])
         self.assertEqual(response.json, {
             'tag_content': 'testing',
-            'tag_aliases': ['test_alias'],
             'tag_name': 'testing',
+            'tag_aliases': ['test_alias'],
             'image_url': None
         })
         self.assertEqual(response.status_code, 200)
