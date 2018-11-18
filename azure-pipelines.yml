@@ -1,7 +1,7 @@
 # https://aka.ms/yaml
 
 jobs:
-  - job: lint-misc
+  - job: lint_misc
     displayName: Lint others
     pool:
       vmImage: ubuntu-16.04
@@ -20,7 +20,7 @@ jobs:
       - script: docker run --rm -i hadolint/hadolint < docker/**/**/Dockerfile
         displayName: run hadolint
 
-  - job: lint-python
+  - job: lint_python
     displayName: Lint Python
     pool:
       vmImage: ubuntu-16.04
