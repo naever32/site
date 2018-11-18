@@ -1,8 +1,27 @@
 # https://aka.ms/yaml
 
 jobs:
-  - job: lint
-    displayName: Lint
+  - job: lint-misc
+    displayName: Lint others
+    pool:
+      vmImage: ubuntu-16.04
+
+    steps:
+      - script: |
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+          sudo add-apt-repository deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable
+          sudo apt-get update
+          sudo apt-get install docker-ce
+        displayName: install docker
+
+      - script: docker run -v .:/app:ro --rm ruby:alpine 'gem install mdl && mdl /app'
+        displayNme: run markdownlint
+
+      - script: docker run --rm -i hadolint/hadolint < docker/**/**/Dockerfile
+        displayName: run hadolint
+
+  - job: lint-python
+    displayName: Lint Python
     pool:
       vmImage: ubuntu-16.04
 
