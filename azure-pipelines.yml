@@ -19,7 +19,7 @@ jobs:
 
       - script: |
           echo 'set -ex' > script.sh
-          echo 'for dockerfile in docker/**/**/Dockerfile; do' >> script.sh
+          echo 'for dockerfile in docker/**/**/**/Dockerfile; do' >> script.sh
           echo '  docker run -i hadolint/hadolint < $dockerfile' >> script.sh
           echo 'done' >> script.sh
           sh script.sh
