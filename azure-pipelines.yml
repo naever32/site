@@ -18,11 +18,11 @@ jobs:
         displayName: run markdownlint
 
       - script: |
-          set -ex
-
-          for dockerfile in docker/**/**/Dockerfile; do
-            docker run -i hadolint/hadolint < $dockerfile
-          done
+          echo 'set -ex' > script.sh
+          echo 'for dockerfile in docker/**/**/Dockerfile; do' >> script.sh
+          echo '  docker run -i hadolint/hadolint < $dockerfile' >> script.sh
+          echo 'done' >> script.sh
+          sh script.sh
         displayName: run hadolint
 
   - job: lint_python
