@@ -14,10 +14,15 @@ jobs:
           sudo apt-get install docker-ce
         displayName: install docker
 
-      - script: docker run -v .:/app:ro --rm ruby:alpine 'gem install mdl && mdl /app'
+      - script: docker run -v ./.:/app:ro --rm ruby:alpine 'gem install mdl && mdl /app'
         displayName: run markdownlint
 
-      - script: docker run --rm -i hadolint/hadolint < docker/**/**/Dockerfile
+      - script: |
+          set -ex
+
+          for dockerfile in docker/**/**/Dockerfile; do
+            docker run -i hadolint/hadolint < $dockerfile
+          done
         displayName: run hadolint
 
   - job: lint_python
