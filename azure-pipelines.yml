@@ -15,7 +15,7 @@ jobs:
         displayName: install docker
 
       - script: docker run -v .:/app:ro --rm ruby:alpine 'gem install mdl && mdl /app'
-        displayNme: run markdownlint
+        displayName: run markdownlint
 
       - script: docker run --rm -i hadolint/hadolint < docker/**/**/Dockerfile
         displayName: run hadolint
